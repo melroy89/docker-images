@@ -1,9 +1,7 @@
 # GTK3, Gtkmm, Cmake, Ninja, cpack, Cppcheck, doxygen Docker Image 
 
-A docker image based on my [Cmake Docker image](https://gitlab.melroy.org/melroy/docker-images/cmake).
+A docker image based on my [Cmake Docker image](https://gitlab.melroy.org/melroy/docker-images/-/tree/main/cmake).
 With the extension of gtkmm library installed.
-
-More info see: [Dockerfile](https://gitlab.melroy.org/melroy/docker-images/gtk3-cmake-ninja/Dockerfile).
 
 **Note:** Since version tag `2.0` until  `3.4` we used GCC 10. Based on the [CMake image 4.3](https://hub.docker.com/r/danger89/cmake) tag.
 
@@ -14,6 +12,10 @@ More info see: [Dockerfile](https://gitlab.melroy.org/melroy/docker-images/gtk3-
 **Note:** Since version tag `4.0` (or higher) we will use GCC v12. Based on the [CMake image 5.0](https://hub.docker.com/r/danger89/cmake) tag.
 
 **Important:** We moved to a different tagging scheme. The tag is just the Debian version we use. Eg. `bookworm`. Also `latest` is no longer created.
+
+## Docker Image
+
+- [Dockerfile](https://gitlab.melroy.org/melroy/docker-images/-/blob/main/gtk3-cmake-ninja/Dockerfile).
 
 ## Build (Optional)
 

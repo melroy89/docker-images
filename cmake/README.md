@@ -8,6 +8,7 @@ Optionally you can use the [Ninja build system](https://ninja-build.org/) and [B
 The image also includes test tools (like `cppcheck`, `cpplint` and `doxygen`).  
 This Docker image also contains other useful programs, like: `gdb`, `valgrind`, `clang-format` and `dot` (generating directed graphs) are installed.
 
+
 ## Usage
 
 Use this Docker image within a CI/CD pipeline of your choice.
@@ -29,6 +30,10 @@ docker pull danger89/cmake:bookworm-cppcheck-2.16.0
 **Note:** Since tag `5.0` and higher the base image is now based on Debian Bookworm instead of Bullseye. We're now using GCC/G++ v12 with CMake v3.25.
 
 **Important:** We moved to a different kind of tagging. The Docker tag is now a simple combination of the base Debian image name + cppcheck version. Eg. `bookworm-cppcheck-2.16.0`. Hopefully that is much easier to understand. We no longer will provide `latest` either.
+
+## Docker Image
+
+- [Dockerfile](https://gitlab.melroy.org/melroy/docker-images/-/blob/main/cmake/Dockerfile).
 
 ## Build (Optional)
 
