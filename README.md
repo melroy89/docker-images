@@ -4,7 +4,7 @@ These are various Docker images by Melroy (also uploaded to [my Docker Hub](http
 
 ## Images
 
-- [CMake](./cmake): A Debian slim base image with CMake, Boost, Doxygen and Cppcheck pre-installed. Including also: `cpplint`, `valgrind`, `pip`, `clang-format` and more..
+- [CMake](./cmake): A Debian slim base image with CMake, Boost, Ninja, Doxygen and Cppcheck pre-installed. Including also: `cpplint`, `valgrind`, `pip`, `clang-format` and more.
 - [pnpm](./pnpm): A Node.js alpine base image with `pnpm` pre-installed.
 - ...
 

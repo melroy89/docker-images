@@ -7,6 +7,8 @@ And optionally use `pnpm-lock.yaml` as your cache key to restore the cache.
 
 ## Usage
 
+Use this Docker image within a CI/CD pipeline of your choice.
+
 GitLab usage example:
 
 ```yaml
@@ -25,4 +27,13 @@ build:
         - pnpm-lock.yaml
     paths:
       - .pnpm-store
+```
+
+## Build (Optional)
+
+Optionally, building the image yourself locally is possible, via:
+
+```sh
+cd pnpm
+docker build --no-cache --tag pnpm .
 ```

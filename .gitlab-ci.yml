@@ -1,0 +1,64 @@
+
+stages:
+- build
+
+variables:
+  DOCKERHUB_REGISTRY: registry-1.docker.io
+  DOCKERHUB_USERNAME: danger89
+
+workflow:
+  rules:
+    - if: '$CI_PROJECT_NAMESPACE == "melroy" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+
+# Authenticate to Docker Hub & GitLab Container Registry
+.docker-login: &docker-login
+  before_script:
+    # Docker Hub
+    - echo "$DOCKERHUB_TOKEN" | docker login "$DOCKERHUB_REGISTRY" -u "$DOCKERHUB_USERNAME" --password-stdin
+    # Using the built-in variables by GitLab
+    - echo "$CI_REGISTRY_PASSWORD" | docker login "$CI_REGISTRY" -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+
+pnpm-alpine:build:
+  stage: build
+  tags:
+    - shell
+  parallel:
+    matrix:
+      - NODE_VERSION: ["22", "23"]
+        # Important: No array for PNPM_VERSION
+        PNPM_VERSION: "10"
+  <<: *docker-login
+  script:
+    - cd pnpm
+    - export IMAGE_NAME="pnpm:${NODE_VERSION}"
+    - |
+      docker build \
+        --build-arg node_version=${NODE_VERSION} \
+        --build-arg pnpm_version=${PNPM_VERSION} \
+        -t $CI_REGISTRY_IMAGE/pnpm:${NODE_VERSION} \
+        -t $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME \
+        -f Dockerfile .
+    - docker push $CI_REGISTRY_IMAGE/$IMAGE_NAME
+    - docker push $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME
+
+cmake:build:
+  stage: build
+  tags:
+    - shell
+  parallel:
+    matrix:
+      - DEBIAN_VERSION: ["bookworm", "trixie"]
+        CPPCHECK_VERSION: "2.16.0"
+  <<: *docker-login
+  script:
+    - cd cmake
+    - export IMAGE_NAME="cmake:${DEBIAN_VERSION}-cppcheck-${CPPCHECK_VERSION}"
+    - |
+      docker build \
+        --build-arg debian_version=${DEBIAN_VERSION} \
+        --build-arg cppcheck_version=${CPPCHECK_VERSION} \
+        -t $CI_REGISTRY_IMAGE/$IMAGE_NAME \
+        -t $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME \
+        -f Dockerfile .
+    - docker push $CI_REGISTRY_IMAGE/$IMAGE_NAME
+    - docker push $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME
