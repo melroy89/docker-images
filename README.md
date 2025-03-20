@@ -4,6 +4,22 @@ These are various Docker images (also uploaded my [Docker Hub](https://hub.docke
 
 ## Images
 
-- CMake: A Debian base image with CMake, Boost, Doxygen and Cppcheck pre-installed. Including also: `cpplint`, `valgrind`, `pip`, `clang-format` and more..
-- pnpm: A Node.js base image with `pnpm` pre-installed
+- [CMake](./cmake): A Debian slim base image with CMake, Boost, Doxygen and Cppcheck pre-installed. Including also: `cpplint`, `valgrind`, `pip`, `clang-format` and more..
+- [pnpm](./pnpm): A Node.js alpine base image with `pnpm` pre-installed.
 - ...
+
+## License
+
+[AGPL v3](LICENSE)
+
+## Author
+
+Melroy van den Berg
+
+## Contact
+
+[melroy.org](https://melroy.org)
+
+## ♥ Donate
+
+[Donate](https://melroy.org/donate.html)
