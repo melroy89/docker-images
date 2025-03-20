@@ -65,3 +65,23 @@ cmake:build:
         -f Dockerfile .
     - docker push $CI_REGISTRY_IMAGE/$IMAGE_NAME
     - docker push $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME
+
+gtk-cmake-ninja:build:
+  stage: build
+  tags:
+    - shell
+  variables:
+    DEBIAN_VERSION: "bookworm"
+    CPPCHECK_VERSION: "2.16.0"
+  <<: *docker-login
+  script:
+    - cd gtk3-cmake-ninja
+    - export IMAGE_NAME="gtk3-docker-cmake-ninja:${DEBIAN_VERSION}"
+    - |
+      docker build \
+        --build-arg melroy_cmake_version=${DEBIAN_VERSION}-cppcheck-${CPPCHECK_VERSION} \
+        -t $CI_REGISTRY_IMAGE/$IMAGE_NAME \
+        -t $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME \
+        -f Dockerfile .
+    - docker push $CI_REGISTRY_IMAGE/$IMAGE_NAME
+    - docker push $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME
