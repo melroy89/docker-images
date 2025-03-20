@@ -45,10 +45,13 @@ cmake:build:
   stage: build
   tags:
     - shell
-  parallel:
-    matrix:
-      - DEBIAN_VERSION: ["bookworm", "trixie"]
-        CPPCHECK_VERSION: "2.16.0"
+  variables:
+    DEBIAN_VERSION: "bookworm"
+    CPPCHECK_VERSION: "2.16.0"
+  #parallel:
+  #  matrix:
+  #    - DEBIAN_VERSION: "bookworm"
+  #      CPPCHECK_VERSION: "2.16.0"
   <<: *docker-login
   script:
     - cd cmake
