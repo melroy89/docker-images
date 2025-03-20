@@ -29,6 +29,14 @@ build:
       - .pnpm-store
 ```
 
+## Docker Tags
+
+While there is a specific pnpm version used (ideally the latest pnpm v10 at the moment of writing).
+
+The _Docker tag_ however is simply the Node.js version.
+
+For example: `23`. This is inline with the Node.js Docker image naming convention. Just note we use the Alpine version.
+
 ## Build (Optional)
 
 Optionally, building the image yourself locally is possible, via:
