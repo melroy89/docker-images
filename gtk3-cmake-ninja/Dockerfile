@@ -1,5 +1,5 @@
 ARG melroy_cmake_version=12
-FROM docker-images/cmake:${melroy_cmake_version}
+FROM registry.melroy.org/melroy/docker-images/cmake:${melroy_cmake_version}
 
 ARG build_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 LABEL org.opencontainers.image.title="GTK3 with Gtkmm CMake Docker Image" \
