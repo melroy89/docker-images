@@ -14,9 +14,9 @@ workflow:
 .docker-login: &docker-login
   before_script:
     # Docker Hub
-    - echo "$DOCKERHUB_TOKEN" | docker login "$DOCKERHUB_REGISTRY" -u "$DOCKERHUB_USERNAME" --password-stdin
+    - echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin "$DOCKERHUB_REGISTRY"
     # Using the built-in variables by GitLab
-    - echo "$CI_REGISTRY_PASSWORD" | docker login "$CI_REGISTRY" -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
 
 pnpm-alpine:build:
   stage: build
