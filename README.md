@@ -8,6 +8,14 @@ These are various Docker images by Melroy (also uploaded to [my Docker Hub](http
 - [GTK3, Gtkmm, Cmake](./gtk3-cmake-ninja): Based on the CMake image above, but with GTK3 and Gtkmm (C++) pre-installed. And with all the same tools again like Ninja, Doxygen, etc.
 - [pnpm](./pnpm): A Node.js alpine base image with `pnpm` (npm replacement) pre-installed.
 
+For example:
+
+```sh
+docker pull registry.melroy.org/melroy/docker-images/gtk3-docker-cmake-ninja:bookworm
+docker pull registry.melroy.org/melroy/docker-images/cmake:bookworm-cppcheck-2.16.0
+docker pull registry.melroy.org/melroy/docker-images/pnpm:22
+```
+
 ## License
 
 [AGPL v3](LICENSE)
