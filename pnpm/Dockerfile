@@ -13,8 +13,19 @@ LABEL org.opencontainers.image.title="Node.js image with pnpm" \
       org.opencontainers.image.source="https://gitlab.melroy.org/melroy/docker-images"
 
 RUN npm install --global corepack@latest
+
+# Enable corepack and prepare pnpm for root user
 RUN corepack enable
 RUN corepack prepare "pnpm@${pnpm_version}" --activate
 RUN pnpm config set store-dir .pnpm-store
+
+# Enable corepack and prepare pnpm for node user
+USER node
+RUN corepack enable
+RUN corepack prepare "pnpm@${pnpm_version}" --activate
+RUN pnpm config set store-dir .pnpm-store
+
+# Switch back to root for the CMD
+USER root
 
 CMD ["node"]
