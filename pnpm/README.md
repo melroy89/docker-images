@@ -17,7 +17,7 @@ stages:
 
 build:
   stage: build
-  image: danger89/pnpm:22-alpine
+  image: danger89/pnpm:22
   script:
     - pnpm install # install dependencies
     # - ... Do more ...
