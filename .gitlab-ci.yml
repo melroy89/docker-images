@@ -25,7 +25,7 @@ pnpm-alpine:build:
     matrix:
       - NODE_VERSION: ["22", "23"]
         # Important: No array for PNPM_VERSION
-        PNPM_VERSION: "10.10.0"
+        PNPM_VERSION: "10.11.0"
   <<: *docker-login
   script:
     - cd pnpm
