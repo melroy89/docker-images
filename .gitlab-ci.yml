@@ -34,7 +34,7 @@ pnpm-alpine:build:
       docker build \
         --build-arg node_version=${NODE_VERSION} \
         --build-arg pnpm_version=${PNPM_VERSION} \
-        -t $CI_REGISTRY_IMAGE/pnpm:${NODE_VERSION} \
+        -t $CI_REGISTRY_IMAGE/$IMAGE_NAME \
         -t $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME \
         -f Dockerfile .
     - docker push $CI_REGISTRY_IMAGE/$IMAGE_NAME
