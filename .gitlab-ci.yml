@@ -2,8 +2,8 @@ default:
   before_script:
     # Docker Hub
     - echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin "$DOCKERHUB_REGISTRY"
-    # Using GitLab project access token
-    - echo "$GITLAB_CONTAINER_ACCESS_TOKEN" | docker login -u "admin" --password-stdin "$CI_REGISTRY"
+    # Using GitLab deploy token
+    - echo "$CI_DEPLOY_PASSWORD" | docker login -u "$CI_DEPLOY_USER" --password-stdin "$CI_REGISTRY"
 
   after_script:
     - docker logout $CI_REGISTRY
