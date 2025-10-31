@@ -23,13 +23,11 @@ Use a specific tag:
 docker pull danger89/cmake:bookworm-cppcheck-2.16.0
 ```
 
-**Note:** Since tag `4.0` and until tag `4.6`, Debian Bullseye was used for GCC 10 compiler.
-
-**Note:** Since tag `4.4` and higher, we build cppcheck ourselves, so we get the [latest stable cppcheck](https://cppcheck.sourceforge.io/).
-
 **Note:** Since tag `5.0` and higher the base image is now based on Debian Bookworm instead of Bullseye. We're now using GCC/G++ v12 with CMake v3.25.
 
 **Important:** We moved to a different kind of tagging. The Docker tag is now a simple combination of the base Debian image name + cppcheck version. Eg. `bookworm-cppcheck-2.16.0`. Hopefully that is much easier to understand. We no longer will provide `latest` either.
+
+**NEW:** We deployed new Trixie based docker image (`trixie-cppcheck-2.18.0`).
 
 ## Docker Image
 
