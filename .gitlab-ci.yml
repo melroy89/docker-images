@@ -5,9 +5,9 @@ default:
     # Using GitLab deploy token
     - echo "$CI_DEPLOY_PASSWORD" | docker login -u "$CI_DEPLOY_USER" --password-stdin "$CI_REGISTRY"
 
-  after_script:
-    - docker logout $CI_REGISTRY
-    - docker logout
+#  after_script:
+#    - docker logout $CI_REGISTRY
+#    - docker logout
 
 stages:
   - build
