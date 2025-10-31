@@ -17,7 +17,7 @@ stages:
 
 build:
   stage: build
-  image: danger89/pnpm:22
+  image: danger89/pnpm:24
   script:
     - pnpm install # install dependencies
     # - ... Do more ...
@@ -35,11 +35,11 @@ While there is a specific pnpm version used (ideally the latest pnpm v10 at the 
 
 The _Docker tag_ however is simply the Node.js version.
 
-For example: `23`. This is inline with the Node.js Docker image naming convention. Just note we use the Alpine version.
+For example: `24`. This is inline with the Node.js Docker image naming convention. Just note we use the Alpine version.
 
 ## Docker Image
 
-- [Dockerfile](https://gitlab.melroy.org/melroy/docker-images/-/blob/main/pnpm/Dockerfile).
+- [Dockerfile](./Dockerfile).
 
 ## Build (Optional)
 

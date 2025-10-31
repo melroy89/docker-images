@@ -1,4 +1,4 @@
-ARG debian_version=12
+ARG debian_version=bookworm
 FROM debian:${debian_version}-slim
 
 ARG cppcheck_version=2.16.0
@@ -23,7 +23,7 @@ RUN apt-get install -y ninja-build doxygen graphviz
 RUN apt-get install -y --no-install-recommends curl wget
 
 # Get cppcheck dependencies from stable; that's good enough
-RUN echo "deb-src http://deb.debian.org/debian bookworm main" >>/etc/apt/sources.list
+RUN echo "deb-src http://deb.debian.org/debian ${debian_version} main" >>/etc/apt/sources.list
 RUN apt-get update
 RUN apt-get build-dep -y cppcheck
 # Download cppcheck source code, build and install

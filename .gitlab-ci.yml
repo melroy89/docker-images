@@ -26,9 +26,10 @@ pnpm-alpine:build:
     - shell
   parallel:
     matrix:
-      - NODE_VERSION: ["22", "23"]
+        # LTS releases only for now
+      - NODE_VERSION: ["22", "24"]
         # Important: No array for PNPM_VERSION
-        PNPM_VERSION: "10.11.0"
+        PNPM_VERSION: "10.20.0"
   script:
     - cd pnpm
     - export IMAGE_NAME="pnpm:${NODE_VERSION}"
@@ -47,12 +48,12 @@ cmake:build:
   tags:
     - shell
   variables:
-    DEBIAN_VERSION: "bookworm"
-    CPPCHECK_VERSION: "2.16.0"
+    DEBIAN_VERSION: "trixie"
+    CPPCHECK_VERSION: "2.18.0"
   #parallel:
   #  matrix:
-  #    - DEBIAN_VERSION: "bookworm"
-  #      CPPCHECK_VERSION: "2.16.0"
+  #    - DEBIAN_VERSION: ""
+  #      CPPCHECK_VERSION: ""
   script:
     - cd cmake
     - export IMAGE_NAME="cmake:${DEBIAN_VERSION}-cppcheck-${CPPCHECK_VERSION}"
@@ -71,14 +72,15 @@ gtk-cmake-ninja:build:
   tags:
     - shell
   variables:
-    DEBIAN_VERSION: "bookworm"
-    CPPCHECK_VERSION: "2.16.0"
+    DEBIAN_VERSION: "trixie"
+    CPPCHECK_VERSION: "2.18.0"
   script:
     - cd gtk3-cmake-ninja
     - export IMAGE_NAME="gtk3-docker-cmake-ninja:${DEBIAN_VERSION}"
     - |
       docker build \
-        --build-arg melroy_cmake_version=${DEBIAN_VERSION}-cppcheck-${CPPCHECK_VERSION} \
+        --build-arg debian_version=${DEBIAN_VERSION} \
+        --build-arg cppcheck_version=${CPPCHECK_VERSION} \
         -t $CI_REGISTRY_IMAGE/$IMAGE_NAME \
         -t $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME \
         -f Dockerfile .

@@ -1,5 +1,6 @@
-ARG melroy_cmake_version=12
-FROM registry.melroy.org/melroy/docker-images/cmake:${melroy_cmake_version}
+ARG debian_version=bookworm
+ARG cppcheck_version=2.16.0
+FROM registry.melroy.org/melroy/docker-images/cmake:${debian_version}-cppcheck-${cppcheck_version}
 
 ARG build_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 LABEL org.opencontainers.image.title="GTK3 with Gtkmm CMake Docker Image" \
