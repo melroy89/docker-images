@@ -1,6 +1,9 @@
 ARG debian_version=bookworm
 FROM debian:${debian_version}-slim
 
+# By default all ARGs are no longer available after the FROM statement.
+# So we need to redefine them if we want to use them later on.
+ARG debian_version
 ARG cppcheck_version=2.16.0
 ARG build_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 

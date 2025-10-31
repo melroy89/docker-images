@@ -69,6 +69,8 @@ cmake:build:
 
 gtk-cmake-ninja:build:
   stage: build
+  # This build depends on the cmake image being built first
+  needs: ["cmake:build"]
   tags:
     - shell
   variables:
