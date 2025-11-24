@@ -88,3 +88,21 @@ gtk-cmake-ninja:build:
         -f Dockerfile .
     - docker push $CI_REGISTRY_IMAGE/$IMAGE_NAME
     - docker push $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME
+
+php:
+  stage: build
+  tags:
+    - shell
+  variables:
+    PHP_VERSION: "8.5"
+  script:
+    - cd php
+    - export IMAGE_NAME="php:${PHP_VERSION}"
+    - |
+      docker build \
+        --build-arg php_version=${PHP_VERSION} \
+        -t $CI_REGISTRY_IMAGE/$IMAGE_NAME \
+        -t $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME \
+        -f Dockerfile .
+    - docker push $CI_REGISTRY_IMAGE/$IMAGE_NAME
+    - docker push $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME
