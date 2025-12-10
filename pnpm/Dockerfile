@@ -19,6 +19,9 @@ RUN corepack enable
 RUN corepack prepare "pnpm@${pnpm_version}" --activate
 RUN pnpm config set store-dir .pnpm-store
 
+# Add turbo globally
+RUN pnpm add -g turbo
+
 # Enable corepack and prepare pnpm for node user
 USER node
 RUN corepack enable
