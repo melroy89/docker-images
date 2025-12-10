@@ -18,6 +18,7 @@ RUN npm install --global corepack@latest
 RUN corepack enable
 RUN corepack prepare "pnpm@${pnpm_version}" --activate
 RUN pnpm config set store-dir .pnpm-store
+RUN pnpm setup
 
 # Add turbo globally
 RUN pnpm add -g turbo
@@ -27,6 +28,7 @@ USER node
 RUN corepack enable
 RUN corepack prepare "pnpm@${pnpm_version}" --activate
 RUN pnpm config set store-dir .pnpm-store
+RUN pnpm setup
 
 # Switch back to root for the CMD
 USER root
