@@ -29,7 +29,7 @@ pnpm-alpine:build:
         # LTS releases only for now
       - NODE_VERSION: ["22", "24"]
         # Important: No array for PNPM_VERSION
-        PNPM_VERSION: "10.20.0"
+        PNPM_VERSION: "10.25.0"
   script:
     - cd pnpm
     - export IMAGE_NAME="pnpm:${NODE_VERSION}"

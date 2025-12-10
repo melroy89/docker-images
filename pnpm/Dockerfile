@@ -12,13 +12,16 @@ LABEL org.opencontainers.image.title="Node.js image with pnpm" \
       org.opencontainers.image.url="https://gitlab.melroy.org/melroy/docker-images" \
       org.opencontainers.image.source="https://gitlab.melroy.org/melroy/docker-images"
 
-RUN npm install --global corepack@latest
+RUN npm install --global --force corepack@latest
 
 # Enable corepack and prepare pnpm for root user
 RUN corepack enable
 RUN corepack prepare "pnpm@${pnpm_version}" --activate
 RUN pnpm config set store-dir .pnpm-store
-RUN pnpm setup
+
+# Needed for global installs
+ENV PNPM_HOME="/root/.local/share/pnpm"
+ENV PATH="${PATH}:${PNPM_HOME}"
 
 # Add turbo globally
 RUN pnpm add -g turbo
@@ -28,7 +31,6 @@ USER node
 RUN corepack enable
 RUN corepack prepare "pnpm@${pnpm_version}" --activate
 RUN pnpm config set store-dir .pnpm-store
-RUN pnpm setup
 
 # Switch back to root for the CMD
 USER root
