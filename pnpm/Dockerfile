@@ -19,6 +19,8 @@ RUN corepack enable
 RUN corepack prepare "pnpm@${pnpm_version}" --activate
 RUN pnpm config set store-dir .pnpm-store
 
+# Disable turbo telemetry
+ENV TURBO_TELEMETRY_DISABLED=1
 # Needed for global installs
 ENV PNPM_HOME="/root/.local/share/pnpm"
 ENV PATH="${PATH}:${PNPM_HOME}"
