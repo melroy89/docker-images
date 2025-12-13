@@ -14,7 +14,7 @@ For example:
 ```sh
 docker pull registry.melroy.org/melroy/docker-images/gtk3-docker-cmake-ninja:bookworm
 docker pull registry.melroy.org/melroy/docker-images/cmake:bookworm-cppcheck-2.16.0
-docker pull registry.melroy.org/melroy/docker-images/pnpm:22
+docker pull registry.melroy.org/melroy/docker-images/pnpm:24
 docker pull registry.melroy.org/melroy/docker-images/php:8.5
 ```
 
