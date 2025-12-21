@@ -1,4 +1,4 @@
-# GTK3, Gtkmm, Cmake, Ninja, cpack, Cppcheck, doxygen Docker Image 
+# GTK, Gtkmm, Cmake, Ninja, cpack, Cppcheck, doxygen Docker Image 
 
 A docker image based on my [Cmake Docker image](../cmake).
 With the extension of gtkmm library installed.
@@ -9,6 +9,8 @@ With the extension of gtkmm library installed.
 
 **NEW:** We deployed Trixie Docker images as well now, based on the latest Debian LTS release.
 
+**EXTRA NEW:** We renamed the docker image, so we now have the tag: `<GTK_VERSION>-<DEBIAN_VERSION>`. Eg. `gtk-cmake-ninja:gtk4.0-trixie`
+
 ## Docker Image
 
 - [Dockerfile](./Dockerfile).
@@ -18,6 +20,6 @@ With the extension of gtkmm library installed.
 Optionally, building the image yourself locally is possible, via:
 
 ```sh
-cd gtk3-cmake-ninja
-docker build --no-cache --tag gtk3-cmake-ninja .
+cd gtk-cmake-ninja
+docker build --no-cache --tag gtk-cmake-ninja .
 ```

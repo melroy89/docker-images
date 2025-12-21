@@ -73,16 +73,21 @@ gtk-cmake-ninja:build:
   needs: ["cmake:build"]
   tags:
     - shell
-  variables:
-    DEBIAN_VERSION: "trixie"
-    CPPCHECK_VERSION: "2.18.0"
+  parallel:
+    matrix:
+        # GTK versions to build
+      - GTK_VERSION: ["3.0", "4.0"]
+        # Important: No array for DEBIAN_VERSION and CPPCHECK_VERSION
+        DEBIAN_VERSION: "trixie"
+        CPPCHECK_VERSION: "2.18.0"
   script:
-    - cd gtk3-cmake-ninja
-    - export IMAGE_NAME="gtk3-docker-cmake-ninja:${DEBIAN_VERSION}"
+    - cd gtk-cmake-ninja
+    - export IMAGE_NAME="gtk-cmake-ninja:${GTK_VERSION}-${DEBIAN_VERSION}"
     - |
       docker build \
         --build-arg debian_version=${DEBIAN_VERSION} \
         --build-arg cppcheck_version=${CPPCHECK_VERSION} \
+        --build-arg gtk_version=${GTK_VERSION} \
         -t $CI_REGISTRY_IMAGE/$IMAGE_NAME \
         -t $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME \
         -f Dockerfile .
