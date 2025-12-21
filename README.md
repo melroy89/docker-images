@@ -12,7 +12,7 @@ These are various Docker images by Melroy (also uploaded to [my Docker Hub](http
 For example:
 
 ```sh
-docker pull registry.melroy.org/melroy/docker-images/gtk-cmake-ninja:gtk3.0-bookworm
+docker pull registry.melroy.org/melroy/docker-images/gtk-cmake-ninja:3.0-bookworm
 docker pull registry.melroy.org/melroy/docker-images/cmake:bookworm-cppcheck-2.16.0
 docker pull registry.melroy.org/melroy/docker-images/pnpm:24
 docker pull registry.melroy.org/melroy/docker-images/php:8.5

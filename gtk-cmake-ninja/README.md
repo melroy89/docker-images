@@ -9,7 +9,7 @@ With the extension of gtkmm library installed.
 
 **NEW:** We deployed Trixie Docker images as well now, based on the latest Debian LTS release.
 
-**EXTRA NEW:** We renamed the docker image, so we now have the tag: `<GTK_VERSION>-<DEBIAN_VERSION>`. Eg. `gtk-cmake-ninja:gtk4.0-trixie`
+**EXTRA NEW:** We renamed the docker image, so we now have the tag: `<GTK_VERSION>-<DEBIAN_VERSION>`. Eg. `gtk-cmake-ninja:4.0-trixie`
 
 ## Docker Image
 
