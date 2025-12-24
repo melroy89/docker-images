@@ -73,7 +73,7 @@ cmake-ubuntu:build:
   parallel:
     matrix:
         # Ubuntu versions to build
-      - UBUNTU_VERSION: ["jammy", "noble", "plucky"]
+      - UBUNTU_VERSION: ["noble", "plucky"]
         # Important: No array for CPPCHECK_VERSION
         CPPCHECK_VERSION: "2.19.0"
   script:
@@ -100,7 +100,7 @@ gtk-cmake-ninja:build:
         # Provide multiple GTK versions (both are installed in the same image), comma separated.
       - GTK_VERSIONS: "3.0,4.0"
         # Both Debian + Ubuntu
-        DISTRO_VERSION: ["bookworm", "trixie", "forky", "jammy", "noble", "plucky"]
+        DISTRO_VERSION: ["bookworm", "trixie", "forky", "noble", "plucky"]
         # Important: No array for CPPCHECK_VERSION
         CPPCHECK_VERSION: "2.19.0"
   script:
