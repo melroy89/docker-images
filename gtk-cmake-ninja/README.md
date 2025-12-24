@@ -11,7 +11,8 @@ With the extension of gtkmm library installed.
 
 ## Docker Image
 
-- [Dockerfile](./Dockerfile).
+- [Dockerfile](https://gitlab.melroy.org/melroy/docker-images/-/blob/main/gtk-cmake-ninja/Dockerfile).
+
 
 ## Build (Optional)
 
