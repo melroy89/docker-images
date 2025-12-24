@@ -1,6 +1,6 @@
-ARG debian_version=trixie
-ARG cppcheck_version=2.16.0
-FROM registry.melroy.org/melroy/docker-images/cmake:${debian_version}-cppcheck-${cppcheck_version}
+ARG distro_version=trixie
+ARG cppcheck_version=2.19.0
+FROM registry.melroy.org/melroy/docker-images/cmake:${distro_version}-cppcheck-${cppcheck_version}
 
 ARG gtk_version=4.0
 ARG build_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")

@@ -1,13 +1,13 @@
-ARG debian_version=bookworm
-FROM debian:${debian_version}-slim
+ARG ubuntu_version=noble
+FROM ubuntu:${ubuntu_version}
 
 # By default all ARGs are no longer available after the FROM statement.
 # So we need to redefine them if we want to use them later on.
-ARG debian_version
-ARG cppcheck_version=2.16.0
+ARG ubuntu_version
+ARG cppcheck_version=2.19.0
 ARG build_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
-LABEL org.opencontainers.image.title="CMake C++ docker image with various additional tools" \
+LABEL org.opencontainers.image.title="CMake C++ Ubuntu Docker image with various additional tools" \
       org.opencontainers.image.description="CMake Docker image with gcc, g++, Boost, Ninja, Doxygen, Graphviz, clang-format, cppcheck, cpplint, gdb, valgrind, dot" \
       org.opencontainers.image.created="${build_date}" \
       org.opencontainers.image.authors="melroy@melroy.org" \
@@ -17,18 +17,20 @@ LABEL org.opencontainers.image.title="CMake C++ docker image with various additi
 ENV DEBIAN_FRONTEND=noninteractive
 
 # APT Update
-RUN apt-get --allow-releaseinfo-change update
-RUN apt-get update && apt-get upgrade -y
+RUN apt --allow-releaseinfo-change update
+RUN apt update && apt upgrade -y
 
 # APT install (base) packages
-RUN apt-get install -y build-essential cmake libboost-all-dev pkg-config
-RUN apt-get install -y ninja-build doxygen graphviz
-RUN apt-get install -y --no-install-recommends curl wget
+RUN apt install -y build-essential cmake libboost-all-dev pkg-config
+RUN apt install -y ninja-build doxygen graphviz
+RUN apt install -y --no-install-recommends curl wget
 
-# Get cppcheck dependencies from stable; that's good enough
-RUN echo "deb-src http://deb.debian.org/debian ${debian_version} main" >>/etc/apt/sources.list
-RUN apt-get update
-RUN apt-get build-dep -y cppcheck
+# Add Deb-src to ubuntu.sources file
+RUN sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/ubuntu.sources
+
+# Get cppcheck dependencies from repo; that's good enough
+RUN apt update
+RUN apt build-dep -y cppcheck
 # Download cppcheck source code, build and install
 RUN wget -O cppcheck.tar.gz https://github.com/danmar/cppcheck/archive/${cppcheck_version}.tar.gz
 RUN tar -xvzf cppcheck.tar.gz
@@ -40,7 +42,7 @@ RUN cd cppcheck-${cppcheck_version} && \
     cmake --install .
 
 # APT install additional packages
-RUN apt-get install -y --no-install-recommends \
+RUN apt install -y --no-install-recommends \
     locales \
     python3-pip \
     ca-certificates \
@@ -55,7 +57,7 @@ RUN apt-get install -y --no-install-recommends \
     gdb \
     clang-format \
     libssl-dev && \
-    apt-get clean
+    apt clean
 
 # Install cpplint via pip
 RUN pip3 install cpplint --break-system-packages

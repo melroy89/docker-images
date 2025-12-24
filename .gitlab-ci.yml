@@ -43,17 +43,16 @@ pnpm-alpine:build:
     - docker push $CI_REGISTRY_IMAGE/$IMAGE_NAME
     - docker push $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME
 
-cmake:build:
+cmake-debian:build:
   stage: build
   tags:
     - shell
-  variables:
-    DEBIAN_VERSION: "trixie"
-    CPPCHECK_VERSION: "2.18.0"
-  #parallel:
-  #  matrix:
-  #    - DEBIAN_VERSION: ""
-  #      CPPCHECK_VERSION: ""
+  parallel:
+    matrix:
+        # GTK versions to build
+      - DEBIAN_VERSION: ["bookworm", "trixie", "forky"]
+        # Important: No array for CPPCHECK_VERSION
+        CPPCHECK_VERSION: "2.19.0"
   script:
     - cd cmake
     - export IMAGE_NAME="cmake:${DEBIAN_VERSION}-cppcheck-${CPPCHECK_VERSION}"
@@ -63,29 +62,53 @@ cmake:build:
         --build-arg cppcheck_version=${CPPCHECK_VERSION} \
         -t $CI_REGISTRY_IMAGE/$IMAGE_NAME \
         -t $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME \
-        -f Dockerfile .
+        -f debian.Dockerfile .
     - docker push $CI_REGISTRY_IMAGE/$IMAGE_NAME
     - docker push $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME
 
-gtk-cmake-ninja:build:
+cmake-ubuntu:build:
   stage: build
-  # This build depends on the cmake image being built first
-  needs: ["cmake:build"]
   tags:
     - shell
   parallel:
     matrix:
         # GTK versions to build
-      - GTK_VERSION: ["3.0", "4.0"]
-        # Important: No array for DEBIAN_VERSION and CPPCHECK_VERSION
-        DEBIAN_VERSION: "trixie"
-        CPPCHECK_VERSION: "2.18.0"
+      - UBUNTU_VERSION: ["noble", "plucky"]
+        # Important: No array for CPPCHECK_VERSION
+        CPPCHECK_VERSION: "2.19.0"
   script:
-    - cd gtk-cmake-ninja
-    - export IMAGE_NAME="gtk-cmake-ninja:${GTK_VERSION}-${DEBIAN_VERSION}"
+    - cd cmake
+    - export IMAGE_NAME="cmake:${UBUNTU_VERSION}-cppcheck-${CPPCHECK_VERSION}"
     - |
       docker build \
-        --build-arg debian_version=${DEBIAN_VERSION} \
+        --build-arg ubuntu_version=${UBUNTU_VERSION} \
+        --build-arg cppcheck_version=${CPPCHECK_VERSION} \
+        -t $CI_REGISTRY_IMAGE/$IMAGE_NAME \
+        -t $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME \
+        -f ubuntu.Dockerfile .
+    - docker push $CI_REGISTRY_IMAGE/$IMAGE_NAME
+    - docker push $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME
+
+gtk-cmake-ninja:build:
+  stage: build
+  # This build depends on the cmake images being built first
+  needs: ["cmake-debian:build", "cmake-ubuntu:build"]
+  tags:
+    - shell
+  parallel:
+    matrix:
+        # GTK versions to build (for now limit new builds to GTK4 only)
+      - GTK_VERSION: "4.0"
+        # Both Debian + Ubuntu
+        DISTRO_VERSION: ["bookworm", "trixie", "forky", "noble", "plucky"]
+        # Important: No array for CPPCHECK_VERSION
+        CPPCHECK_VERSION: "2.19.0"
+  script:
+    - cd gtk-cmake-ninja
+    - export IMAGE_NAME="gtk-cmake-ninja:${GTK_VERSION}-${DISTRO_VERSION}"
+    - |
+      docker build \
+        --build-arg distro_version=${DISTRO_VERSION} \
         --build-arg cppcheck_version=${CPPCHECK_VERSION} \
         --build-arg gtk_version=${GTK_VERSION} \
         -t $CI_REGISTRY_IMAGE/$IMAGE_NAME \
