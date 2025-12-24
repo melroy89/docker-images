@@ -97,20 +97,20 @@ gtk-cmake-ninja:build:
     - shell
   parallel:
     matrix:
-        # GTK versions to build (for now limit new builds to GTK4 only)
-      - GTK_VERSION: "4.0"
+        # Provide multiple GTK versions (both are installed in the same image), comma separated.
+      - GTK_VERSIONS: "3.0,4.0"
         # Both Debian + Ubuntu
         DISTRO_VERSION: ["bookworm", "trixie", "forky", "noble", "plucky"]
         # Important: No array for CPPCHECK_VERSION
         CPPCHECK_VERSION: "2.19.0"
   script:
     - cd gtk-cmake-ninja
-    - export IMAGE_NAME="gtk-cmake-ninja:${GTK_VERSION}-${DISTRO_VERSION}"
+    - export IMAGE_NAME="gtk-cmake-ninja:${DISTRO_VERSION}"
     - |
       docker build \
         --build-arg distro_version=${DISTRO_VERSION} \
         --build-arg cppcheck_version=${CPPCHECK_VERSION} \
-        --build-arg gtk_version=${GTK_VERSION} \
+        --build-arg gtk_versions=${GTK_VERSIONS} \
         -t $CI_REGISTRY_IMAGE/$IMAGE_NAME \
         -t $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME \
         -f Dockerfile .
