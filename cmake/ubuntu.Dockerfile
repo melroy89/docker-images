@@ -38,7 +38,7 @@ RUN cd cppcheck-${cppcheck_version} && \
     mkdir build && \
     cd build && \
     cmake -DUSE_MATCHCOMPILER=ON .. && \
-    cmake --build . -- -j 20 && \
+    cmake --build . -- -j 6 && \
     cmake --install .
 
 # APT install additional packages
