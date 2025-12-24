@@ -26,7 +26,7 @@ docker pull danger89/cmake:trixie-cppcheck-2.19.0
 
 **NEW:** We deployed new Trixie based docker image (tag: `trixie-cppcheck-2.19.0`).
 
-**NEW NEW:** We deployed Ubuntu based docker images as well now (tag: `noble-cppcheck-2.19.0` or `plucky-cppcheck-2.19.0`).
+**NEW NEW:** We deployed Ubuntu based docker images as well now (tag: `noble-cppcheck-2.19.0` or `plucky-cppcheck-2.19.0`). Which allows specific `.deb` packages for both Debian and Ubuntu if you wish to use this Docker image for packaging as well.
 
 ## Docker Image
 
