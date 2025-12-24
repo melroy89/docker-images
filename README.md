@@ -5,15 +5,15 @@ These are various Docker images by Melroy (also uploaded to [my Docker Hub](http
 ## Images
 
 - [CMake](./cmake): A Debian slim base image with CMake, Boost, Ninja, Doxygen and Cppcheck pre-installed. Including also: `cpplint`, `valgrind`, `pip`, `clang-format` and more.
-- [GTK, Gtkmm, Cmake](./gtk-cmake-ninja): Based on the CMake image above, but with GTK and Gtkmm (C++) pre-installed (eg. GTK3 or GTK4, see tag name). And with all the same tools again like Ninja, Doxygen, etc.
+- [GTK, Gtkmm, Cmake](./gtk-cmake-ninja): Based on the CMake image (see above). However, with GTK and Gtkmm (C++), both GTK3 and GTK4 dev packages are pre-installed. With all the same tools like Ninja, Doxygen, etc from the CMake image.
 - [pnpm](./pnpm): A Node.js alpine base image with `pnpm` (npm replacement) pre-installed.
 - [php](./php): A PHP Docker CLI image with `composer`, as well as `ssh`, `rsync`, `unzip` and `7z` installed. Ideal for [CodeIgniter 4](https://www.codeigniter.com/) projects with `phpmetrics`.
 
 For example:
 
 ```sh
-docker pull registry.melroy.org/melroy/docker-images/gtk-cmake-ninja:3.0-bookworm
-docker pull registry.melroy.org/melroy/docker-images/cmake:bookworm-cppcheck-2.16.0
+docker pull registry.melroy.org/melroy/docker-images/gtk-cmake-ninja:trixie
+docker pull registry.melroy.org/melroy/docker-images/cmake:trixie-cppcheck-2.19.0
 docker pull registry.melroy.org/melroy/docker-images/pnpm:24
 docker pull registry.melroy.org/melroy/docker-images/php:8.5
 ```

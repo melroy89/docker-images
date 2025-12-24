@@ -7,7 +7,7 @@ With the extension of gtkmm library installed.
 
 **NEW:** We deployed Trixie Docker images as well now, based on the latest Debian LTS release.
 
-**EXTRA NEW:** We now install multiple GTK versions (both GTK3 and GTK4 at the moment), the tags are still: `<DISTRO_RELEASE_NAME>`. Eg. `gtk-cmake-ninja:trixie` or `gtk-cmake-ninja:noble`
+**EXTRA NEW:** We now install multiple GTK versions (both GTK3 and GTK4 at the moment) and also added Ubuntu distros, the tags are still: `<DISTRO_RELEASE_NAME>`. Eg. `gtk-cmake-ninja:trixie` or `gtk-cmake-ninja:noble`.
 
 ## Docker Image
 
