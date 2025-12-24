@@ -29,7 +29,7 @@ pnpm-alpine:build:
         # LTS releases only for now
       - NODE_VERSION: ["22", "24"]
         # Important: No array for PNPM_VERSION
-        PNPM_VERSION: "10.25.0"
+        PNPM_VERSION: "10.26.2"
   script:
     - cd pnpm
     - export IMAGE_NAME="pnpm:${NODE_VERSION}"
@@ -49,7 +49,7 @@ cmake-debian:build:
     - shell
   parallel:
     matrix:
-        # GTK versions to build
+        # Debian versions to build
       - DEBIAN_VERSION: ["bookworm", "trixie", "forky"]
         # Important: No array for CPPCHECK_VERSION
         CPPCHECK_VERSION: "2.19.0"
@@ -72,8 +72,8 @@ cmake-ubuntu:build:
     - shell
   parallel:
     matrix:
-        # GTK versions to build
-      - UBUNTU_VERSION: ["noble", "plucky"]
+        # Ubuntu versions to build
+      - UBUNTU_VERSION: ["jammy", "noble", "plucky"]
         # Important: No array for CPPCHECK_VERSION
         CPPCHECK_VERSION: "2.19.0"
   script:
@@ -100,7 +100,7 @@ gtk-cmake-ninja:build:
         # Provide multiple GTK versions (both are installed in the same image), comma separated.
       - GTK_VERSIONS: "3.0,4.0"
         # Both Debian + Ubuntu
-        DISTRO_VERSION: ["bookworm", "trixie", "forky", "noble", "plucky"]
+        DISTRO_VERSION: ["bookworm", "trixie", "forky", "jammy", "noble", "plucky"]
         # Important: No array for CPPCHECK_VERSION
         CPPCHECK_VERSION: "2.19.0"
   script:
@@ -117,7 +117,7 @@ gtk-cmake-ninja:build:
     - docker push $CI_REGISTRY_IMAGE/$IMAGE_NAME
     - docker push $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME
 
-php:
+php:build:
   stage: build
   tags:
     - shell
