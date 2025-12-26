@@ -51,8 +51,9 @@ cmake-debian:build:
     matrix:
         # Debian versions to build
       - DEBIAN_VERSION: ["bookworm", "trixie", "forky"]
-        # Important: No array for CPPCHECK_VERSION
+        # Important: No array for CPPCHECK_VERSION and CMAKE_VERSION
         CPPCHECK_VERSION: "2.19.0"
+        CMAKE_VERSION: "4.2.1"
   script:
     - cd cmake
     - export IMAGE_NAME="cmake:${DEBIAN_VERSION}-cppcheck-${CPPCHECK_VERSION}"
@@ -60,6 +61,7 @@ cmake-debian:build:
       docker build \
         --build-arg debian_version=${DEBIAN_VERSION} \
         --build-arg cppcheck_version=${CPPCHECK_VERSION} \
+        --build-arg cmake_version=${CMAKE_VERSION} \
         -t $CI_REGISTRY_IMAGE/$IMAGE_NAME \
         -t $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME \
         -f debian.Dockerfile .
@@ -74,8 +76,9 @@ cmake-ubuntu:build:
     matrix:
         # Ubuntu versions to build
       - UBUNTU_VERSION: ["noble", "plucky"]
-        # Important: No array for CPPCHECK_VERSION
+        # Important: No array for CPPCHECK_VERSION and CMAKE_VERSION
         CPPCHECK_VERSION: "2.19.0"
+        CMAKE_VERSION: "4.2.1"
   script:
     - cd cmake
     - export IMAGE_NAME="cmake:${UBUNTU_VERSION}-cppcheck-${CPPCHECK_VERSION}"
@@ -83,6 +86,7 @@ cmake-ubuntu:build:
       docker build \
         --build-arg ubuntu_version=${UBUNTU_VERSION} \
         --build-arg cppcheck_version=${CPPCHECK_VERSION} \
+        --build-arg cmake_version=${CMAKE_VERSION} \
         -t $CI_REGISTRY_IMAGE/$IMAGE_NAME \
         -t $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME \
         -f ubuntu.Dockerfile .

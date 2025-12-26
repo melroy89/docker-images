@@ -5,6 +5,7 @@ FROM ubuntu:${ubuntu_version}
 # So we need to redefine them if we want to use them later on.
 ARG ubuntu_version
 ARG cppcheck_version=2.19.0
+ARG cmake_version=4.2.1
 ARG build_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 LABEL org.opencontainers.image.title="CMake C++ Ubuntu Docker image with various additional tools" \
@@ -21,9 +22,17 @@ RUN apt --allow-releaseinfo-change update
 RUN apt update && apt upgrade -y
 
 # APT install (base) packages
-RUN apt install -y build-essential cmake libboost-all-dev pkg-config
+RUN apt install -y build-essential libboost-all-dev pkg-config pkg-config libssl-dev openssl
 RUN apt install -y ninja-build doxygen graphviz
 RUN apt install -y --no-install-recommends curl wget
+
+# Download cmake source code, build and install
+RUN wget -O cmake.tar.gz https://github.com/Kitware/CMake/releases/download/v${cmake_version}/cmake-${cmake_version}.tar.gz
+RUN tar -xvzf cmake.tar.gz
+RUN cd cmake-${cmake_version} && \
+    ./bootstrap --parallel=6 --generator=Ninja && \
+    ninja && \
+    ninja install
 
 # Add Deb-src to ubuntu.sources file
 RUN sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/ubuntu.sources
@@ -37,9 +46,9 @@ RUN tar -xvzf cppcheck.tar.gz
 RUN cd cppcheck-${cppcheck_version} && \
     mkdir build && \
     cd build && \
-    cmake -DUSE_MATCHCOMPILER=ON .. && \
-    cmake --build . -- -j 6 && \
-    cmake --install .
+    cmake -DUSE_MATCHCOMPILER=ON -DCMAKE_BUILD_TYPE=Release -G Ninja .. && \
+    ninja && \
+    ninja install
 
 # APT install additional packages
 RUN apt install -y --no-install-recommends \
@@ -63,8 +72,8 @@ RUN apt install -y --no-install-recommends \
 RUN pip3 install cpplint --break-system-packages
 # Clean-up
 RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-# Clean-up manual build(s)
-RUN rm -rf cppcheck.tar.gz && rm -rf cppcheck-${cppcheck_version}
+# Clean-up manual builds
+RUN rm -rf cppcheck.tar.gz && rm -rf cppcheck-${cppcheck_version} && rm -rf cmake.tar.gz && rm -rf cmake-${cmake_version}
 
 # set the locale to en_US.UTF-8
 RUN echo "en_US.UTF-8 UTF-8" >/etc/locale.gen && \
