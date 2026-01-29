@@ -21,8 +21,14 @@ RUN apt update && \
       apt clean && \
       rm -rf /var/lib/apt/lists/*
 
-# Create a non-root user
+# Update to latest npm
+RUN npm install -g npm@latest
+
+# Create a non-root user with UID and GID 1000
+# and use /build as home directory
 RUN groupadd -g 1000 user && \
-     useradd -u 1000 -g 1000 -ms /bin/bash user
+      useradd -u 1000 -g 1000 -m -d /build -s /bin/bash user
 
 USER user
+
+WORKDIR /build
