@@ -23,6 +23,6 @@ RUN apt update && \
 
 # Create a non-root user
 RUN groupadd -g 1000 user && \
-     useradd -u 1000 -g 1000 -s /bin/bash user
+     useradd -u 1000 -g 1000 -ms /bin/bash user
 
 USER user
