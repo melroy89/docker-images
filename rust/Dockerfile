@@ -1,6 +1,6 @@
 ARG rust_version=1.93
 
-FROM rust:${rust_version}-bullseye
+FROM rust:${rust_version}-trixie
 
 ARG node_version=24.13.0
 ARG build_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
