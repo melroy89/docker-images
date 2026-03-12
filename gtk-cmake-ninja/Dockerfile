@@ -14,6 +14,7 @@ LABEL org.opencontainers.image.title="GTK with Gtkmm CMake Docker Image" \
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && \
-  apt-get install -y curl libcurl4-openssl-dev xvfb $(echo ${gtk_versions} | tr ',' ' ' | xargs -n 1 printf "libgtkmm-%s-dev ") && \
+  apt-get install -y curl libsecret-1-dev libcurl4-openssl-dev xvfb \
+    $(echo ${gtk_versions} | tr ',' ' ' | xargs -n 1 printf "libgtkmm-%s-dev ") && \
   apt-get clean && \
   rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
