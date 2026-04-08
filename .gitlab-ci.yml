@@ -140,14 +140,14 @@ rust:build:
   tags:
     - shell
   variables:
-    RUST_VERSION: "1.93"
-    NODE_VERSION: "24.13.0"
+    RUST_VERSION: "1.94"
+    NODE_VERSION: "24.14.0"
   script:
     - cd rust
     - export IMAGE_NAME="rust:${RUST_VERSION}-node-${NODE_VERSION}"
     - |
       docker build \
-        --build-arg php_version=${RUST_VERSION} \
+        --build-arg rust_version=${RUST_VERSION} \
         --build-arg node_version=${NODE_VERSION} \
         -t $CI_REGISTRY_IMAGE/$IMAGE_NAME \
         -t $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME \

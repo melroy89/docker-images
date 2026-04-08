@@ -1,12 +1,13 @@
-ARG rust_version=1.93
+ARG rust_version=1.94
 
 FROM rust:${rust_version}-trixie
 
-ARG node_version=24.13.0
+ARG pnpm_version=latest
+ARG node_version=24.14.0
 ARG build_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 LABEL org.opencontainers.image.title="Rust image with Node.js" \
-      org.opencontainers.image.description="Rust image with Node.js + build essential, pkg-config and rsync preinstalled" \
+      org.opencontainers.image.description="Rust image with Node.js, pnpm, build essential, pkg-config and rsync preinstalled" \
       org.opencontainers.image.created="${build_date}" \
       org.opencontainers.image.authors="melroy@melroy.org" \
       org.opencontainers.image.url="https://gitlab.melroy.org/melroy/docker-images" \
@@ -21,8 +22,26 @@ RUN apt update && \
       apt clean && \
       rm -rf /var/lib/apt/lists/*
 
-# Update to latest npm
+# Update npm to latest version
 RUN npm install -g npm@latest
+
+RUN npm install --global --force corepack@latest
+
+# Enable pnpm for root user
+RUN corepack enable pnpm
+# Pin pnpm version
+RUN corepack prepare "pnpm@${pnpm_version}" --activate
+# Configure pnpm store
+RUN pnpm config set store-dir .pnpm-store
+
+# Disable turbo telemetry
+ENV TURBO_TELEMETRY_DISABLED=1
+# Needed for global installs
+ENV PNPM_HOME="/root/.local/share/pnpm"
+ENV PATH="${PATH}:${PNPM_HOME}"
+
+# Add turbo globally
+RUN pnpm add -g turbo
 
 # Create a non-root user with UID and GID 1000
 # and use /build as home directory
@@ -30,5 +49,11 @@ RUN groupadd -g 1000 user && \
       useradd -u 1000 -g 1000 -m -d /build -s /bin/bash user
 
 USER user
+# Enable corepack and prepare pnpm for user 'user'
+RUN corepack enable
+# Pin pnpm version
+RUN corepack prepare "pnpm@${pnpm_version}" --activate
+# Configure pnpm store
+RUN pnpm config set store-dir .pnpm-store
 
 WORKDIR /build

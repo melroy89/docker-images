@@ -12,11 +12,17 @@ LABEL org.opencontainers.image.title="Node.js image with pnpm" \
       org.opencontainers.image.url="https://gitlab.melroy.org/melroy/docker-images" \
       org.opencontainers.image.source="https://gitlab.melroy.org/melroy/docker-images"
 
+
+# Update npm to latest version
+RUN npm install -g npm@latest
+
 RUN npm install --global --force corepack@latest
 
 # Enable corepack and prepare pnpm for root user
 RUN corepack enable
+# Pin pnpm version
 RUN corepack prepare "pnpm@${pnpm_version}" --activate
+# Configure pnpm store
 RUN pnpm config set store-dir .pnpm-store
 
 # Disable turbo telemetry
@@ -31,7 +37,9 @@ RUN pnpm add -g turbo
 # Enable corepack and prepare pnpm for node user
 USER node
 RUN corepack enable
+# Pin pnpm version
 RUN corepack prepare "pnpm@${pnpm_version}" --activate
+# Configure pnpm store
 RUN pnpm config set store-dir .pnpm-store
 
 # Switch back to root for the CMD
