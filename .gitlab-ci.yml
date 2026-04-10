@@ -22,10 +22,10 @@ pnpm-alpine:build:
     - shell
   parallel:
     matrix:
-        # LTS releases only for now
+      # LTS releases only for now (only major version)
       - NODE_VERSION: ["22", "24"]
         # Important: No array for PNPM_VERSION
-        PNPM_VERSION: "10.32.1"
+        PNPM_VERSION: "10.33.0"
   script:
     - cd pnpm
     - export IMAGE_NAME="pnpm:${NODE_VERSION}"
@@ -39,13 +39,39 @@ pnpm-alpine:build:
     - docker push $CI_REGISTRY_IMAGE/$IMAGE_NAME
     - docker push $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME
 
+pnpm-debian:build:
+  stage: build
+  tags:
+    - shell
+  parallel:
+    matrix:
+      # Only build latest LTS version for now (major + minor node.js version)
+      - NODE_VERSION: "24.14"
+        # Important: No array for DEBIAN_VERSION (just use latest stable)
+        DEBIAN_VERSION: "trixie"
+        # Important: No array for PNPM_VERSION
+        PNPM_VERSION: "10.33.0"
+  script:
+    - cd debian-pnpm
+    - export IMAGE_NAME="debian-pnpm:${NODE_VERSION}-${DEBIAN_VERSION}"
+    - |
+      docker build \
+        --build-arg node_version=${NODE_VERSION} \
+        --build-arg debian_version=${DEBIAN_VERSION} \
+        --build-arg pnpm_version=${PNPM_VERSION} \
+        -t $CI_REGISTRY_IMAGE/$IMAGE_NAME \
+        -t $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME \
+        -f Dockerfile .
+    - docker push $CI_REGISTRY_IMAGE/$IMAGE_NAME
+    - docker push $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME
+
 cmake-debian:build:
   stage: build
   tags:
     - shell
   parallel:
     matrix:
-        # Debian versions to build
+      # Debian versions to build
       - DEBIAN_VERSION: ["bookworm", "trixie", "forky"]
         # Important: No array for CPPCHECK_VERSION and CMAKE_VERSION
         CPPCHECK_VERSION: "2.19.0"
@@ -70,7 +96,7 @@ cmake-ubuntu:build:
     - shell
   parallel:
     matrix:
-        # Ubuntu versions to build
+      # Ubuntu versions to build
       - UBUNTU_VERSION: ["noble", "plucky"]
         # Important: No array for CPPCHECK_VERSION and CMAKE_VERSION
         CPPCHECK_VERSION: "2.19.0"
@@ -97,7 +123,7 @@ gtk-cmake-ninja:build:
     - shell
   parallel:
     matrix:
-        # Provide multiple GTK versions (both are installed in the same image), comma separated.
+      # Provide multiple GTK versions (both are installed in the same image), comma separated.
       - GTK_VERSIONS: "3.0,4.0"
         # Both Debian + Ubuntu
         DISTRO_VERSION: ["bookworm", "trixie", "forky", "noble", "plucky"]
@@ -154,4 +180,3 @@ rust:build:
         -f Dockerfile .
     - docker push $CI_REGISTRY_IMAGE/$IMAGE_NAME
     - docker push $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME
-

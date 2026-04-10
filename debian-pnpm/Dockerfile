@@ -1,17 +1,17 @@
 ARG node_version=current
+ARG debian_version=trixie
 
-FROM node:${node_version}-alpine
+FROM node:${node_version}-${debian_version}-slim
 
 ARG pnpm_version=latest
 ARG build_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
-LABEL org.opencontainers.image.title="Node.js image alpine with pnpm" \
-      org.opencontainers.image.description="Node.js image alpine with pnpm" \
+LABEL org.opencontainers.image.title="Node.js image Debian with pnpm" \
+      org.opencontainers.image.description="Node.js image using Debian with pnpm" \
       org.opencontainers.image.created="${build_date}" \
       org.opencontainers.image.authors="melroy@melroy.org" \
       org.opencontainers.image.url="https://gitlab.melroy.org/melroy/docker-images" \
       org.opencontainers.image.source="https://gitlab.melroy.org/melroy/docker-images"
-
 
 # Update npm to latest version
 RUN npm install -g npm@latest
