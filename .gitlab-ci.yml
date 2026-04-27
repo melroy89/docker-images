@@ -23,7 +23,7 @@ pnpm-alpine:build:
   parallel:
     matrix:
       # LTS releases only for now (only major version)
-      - NODE_VERSION: ["22", "24"]
+      - NODE_VERSION: ["24"]
         # Important: No array for PNPM_VERSION
         PNPM_VERSION: "10.33.2"
   script:
