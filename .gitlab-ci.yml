@@ -25,7 +25,7 @@ pnpm-alpine:build:
       # LTS releases only for now (only major version)
       - NODE_VERSION: ["22", "24"]
         # Important: No array for PNPM_VERSION
-        PNPM_VERSION: "10.33.0"
+        PNPM_VERSION: "10.33.2"
   script:
     - cd pnpm
     - export IMAGE_NAME="pnpm:${NODE_VERSION}"
@@ -50,7 +50,7 @@ pnpm-debian:build:
         # Important: No array for DEBIAN_VERSION (just use latest stable)
         DEBIAN_VERSION: "trixie"
         # Important: No array for PNPM_VERSION
-        PNPM_VERSION: "10.33.0"
+        PNPM_VERSION: "10.33.2"
   script:
     - cd debian-pnpm
     - export IMAGE_NAME="debian-pnpm:${NODE_VERSION}-${DEBIAN_VERSION}"
@@ -168,6 +168,7 @@ rust:build:
   variables:
     RUST_VERSION: "1.94"
     NODE_VERSION: "24.14.0"
+    PNPM_VERSION: "10.33.2"
   script:
     - cd rust
     - export IMAGE_NAME="rust:${RUST_VERSION}-node-${NODE_VERSION}"
@@ -175,6 +176,7 @@ rust:build:
       docker build \
         --build-arg rust_version=${RUST_VERSION} \
         --build-arg node_version=${NODE_VERSION} \
+        --build-arg pnpm_version=${PNPM_VERSION} \
         -t $CI_REGISTRY_IMAGE/$IMAGE_NAME \
         -t $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME \
         -f Dockerfile .
