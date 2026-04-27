@@ -17,9 +17,9 @@ For example:
 docker pull registry.melroy.org/melroy/docker-images/gtk-cmake-ninja:trixie
 docker pull registry.melroy.org/melroy/docker-images/cmake:trixie-cppcheck-2.19.0
 docker pull registry.melroy.org/melroy/docker-images/pnpm:24
-docker pull registry.melroy.org/melroy/docker-images/debian-pnpm:24.14-trixie
+docker pull registry.melroy.org/melroy/docker-images/debian-pnpm:24.15.0-trixie
 docker pull registry.melroy.org/melroy/docker-images/php:8.5
-docker pull registry.melroy.org/melroy/docker-images/rust:1.94-node-24.14.0
+docker pull registry.melroy.org/melroy/docker-images/rust:1.95-node-24.15.0
 ```
 
 ## License

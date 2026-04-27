@@ -46,7 +46,7 @@ pnpm-debian:build:
   parallel:
     matrix:
       # Only build latest LTS version for now (major + minor node.js version)
-      - NODE_VERSION: "24.14"
+      - NODE_VERSION: "24.15.0"
         # Important: No array for DEBIAN_VERSION (just use latest stable)
         DEBIAN_VERSION: "trixie"
         # Important: No array for PNPM_VERSION
@@ -166,8 +166,8 @@ rust:build:
   tags:
     - shell
   variables:
-    RUST_VERSION: "1.94"
-    NODE_VERSION: "24.14.0"
+    RUST_VERSION: "1.95"
+    NODE_VERSION: "24.15.0"
     PNPM_VERSION: "10.33.2"
   script:
     - cd rust

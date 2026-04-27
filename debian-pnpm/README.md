@@ -15,7 +15,7 @@ Use this Docker image within a build of your application.
 GitLab usage example:
 
 ```docker
-FROM danger89/debian-pnpm:24.14-trixie AS builder
+FROM danger89/debian-pnpm:24.115.0-trixie AS builder
 
 ARG commitHash
 ENV DOCKER_COMMIT_HASH=${commitHash}
@@ -33,7 +33,7 @@ RUN pnpm install --prod
 
 The _Docker tag_ is a combination of the pnpm version + Debian distro name.
 
-For example: `24.14-trixie`. This is inline with the Node.js Docker image naming convention.
+For example: `24.1115.0-trixie`. This is inline with the Node.js Docker image naming convention.
 
 ## Docker Image
 
