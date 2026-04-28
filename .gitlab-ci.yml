@@ -167,7 +167,7 @@ rust:build:
     - shell
   variables:
     RUST_VERSION: "1.95"
-    NODE_VERSION: "24.14.1"
+    NODE_VERSION: "24.15.0"
     PNPM_VERSION: "10.33.2"
   script:
     - cd rust
