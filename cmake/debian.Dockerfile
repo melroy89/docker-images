@@ -4,8 +4,8 @@ FROM debian:${debian_version}-slim
 # By default all ARGs are no longer available after the FROM statement.
 # So we need to redefine them if we want to use them later on.
 ARG debian_version
-ARG cppcheck_version=2.19.0
-ARG cmake_version=4.2.1
+ARG cppcheck_version=2.20.0
+ARG cmake_version=4.3.2
 ARG build_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 LABEL org.opencontainers.image.title="CMake C++ Debian Docker image with various additional tools" \
