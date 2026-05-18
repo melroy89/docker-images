@@ -32,7 +32,7 @@ ENV PNPM_HOME="/root/.local/share/pnpm"
 ENV PATH="${PATH}:${PNPM_HOME}"
 
 # Add turbo globally
-RUN pnpm add -g turbo
+RUN pnpm add turbo --global
 
 # Enable corepack and prepare pnpm for node user
 USER node
