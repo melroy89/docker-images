@@ -36,9 +36,14 @@ RUN pnpm config set store-dir .pnpm-store
 
 # Disable turbo telemetry
 ENV TURBO_TELEMETRY_DISABLED=1
-# Needed for global installs
+# Set pnpm global bin directory and add it to PATH
 ENV PNPM_HOME="/root/.local/share/pnpm"
 ENV PATH="${PATH}:${PNPM_HOME}"
+
+# Create the directory and tell pnpm explicitly to use it
+# This bypasses the need for 'pnpm setup'
+RUN mkdir -p "$PNPM_HOME" && \
+    pnpm config set global-bin-dir "$PNPM_HOME"
 
 # Add turbo globally
 RUN pnpm add turbo --global
