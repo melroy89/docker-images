@@ -1,10 +1,3 @@
-default:
-  before_script:
-    # Docker Hub
-    - echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin "$DOCKERHUB_REGISTRY"
-    # Using GitLab deploy token
-    - echo "$CI_DEPLOY_PASSWORD" | docker login -u "$CI_DEPLOY_USER" --password-stdin "$CI_REGISTRY"
-
 stages:
   - build
 
@@ -14,35 +7,68 @@ variables:
 
 workflow:
   rules:
-    - if: '$CI_PROJECT_NAMESPACE == "melroy" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_PROJECT_NAMESPACE != "melroy"'
+      when: never
+    # Scheduled and manually triggered (web UI) pipelines rebuild everything
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+    # Pushes to the default branch only rebuild the images whose files changed
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
 
-pnpm-alpine:build:
+default:
+  # Allow newer pipelines to auto-cancel jobs of redundant older pipelines
+  interruptible: true
+  before_script:
+    # Docker Hub
+    - echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin "$DOCKERHUB_REGISTRY"
+    # Using GitLab deploy token
+    - echo "$CI_DEPLOY_PASSWORD" | docker login -u "$CI_DEPLOY_USER" --password-stdin "$CI_REGISTRY"
+
+# Shared build & push logic. Jobs set: BUILD_DIR, IMAGE_NAME, BUILD_ARGS
+# and optionally DOCKERFILE (defaults to "Dockerfile").
+# --pull ensures we always build on top of the latest (patched) base image,
+# while still reusing the local layer cache when the base digest is unchanged.
+.docker-build:
   stage: build
   tags:
     - shell
+  variables:
+    DOCKERFILE: Dockerfile
+  script:
+    - cd $BUILD_DIR
+    - |
+      docker build \
+        --pull \
+        --build-arg build_date="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+        $BUILD_ARGS \
+        -t $CI_REGISTRY_IMAGE/$IMAGE_NAME \
+        -t $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME \
+        -f $DOCKERFILE .
+    - docker push $CI_REGISTRY_IMAGE/$IMAGE_NAME
+    - docker push $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME
+
+pnpm-alpine:build:
+  extends: .docker-build
   parallel:
     matrix:
       # LTS releases only for now (only major version)
       - NODE_VERSION: ["24"]
         # Important: No array for PNPM_VERSION
         PNPM_VERSION: "11.9.0"
-  script:
-    - cd pnpm
-    - export IMAGE_NAME="pnpm:${NODE_VERSION}"
-    - |
-      docker build \
-        --build-arg node_version=${NODE_VERSION} \
-        --build-arg pnpm_version=${PNPM_VERSION} \
-        -t $CI_REGISTRY_IMAGE/$IMAGE_NAME \
-        -t $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME \
-        -f Dockerfile .
-    - docker push $CI_REGISTRY_IMAGE/$IMAGE_NAME
-    - docker push $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME
+  variables:
+    BUILD_DIR: pnpm
+    IMAGE_NAME: pnpm:${NODE_VERSION}
+    BUILD_ARGS: >-
+      --build-arg node_version=${NODE_VERSION}
+      --build-arg pnpm_version=${PNPM_VERSION}
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web"'
+    - changes:
+        - pnpm/**/*
+        - .gitlab-ci.yml
 
 pnpm-debian:build:
-  stage: build
-  tags:
-    - shell
+  extends: .docker-build
   parallel:
     matrix:
       # Only build latest LTS version for now (major + minor node.js version)
@@ -51,24 +77,21 @@ pnpm-debian:build:
         DEBIAN_VERSION: "trixie"
         # Important: No array for PNPM_VERSION
         PNPM_VERSION: "11.9.0"
-  script:
-    - cd debian-pnpm
-    - export IMAGE_NAME="debian-pnpm:${NODE_VERSION}-${DEBIAN_VERSION}"
-    - |
-      docker build \
-        --build-arg node_version=${NODE_VERSION} \
-        --build-arg debian_version=${DEBIAN_VERSION} \
-        --build-arg pnpm_version=${PNPM_VERSION} \
-        -t $CI_REGISTRY_IMAGE/$IMAGE_NAME \
-        -t $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME \
-        -f Dockerfile .
-    - docker push $CI_REGISTRY_IMAGE/$IMAGE_NAME
-    - docker push $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME
+  variables:
+    BUILD_DIR: debian-pnpm
+    IMAGE_NAME: debian-pnpm:${NODE_VERSION}-${DEBIAN_VERSION}
+    BUILD_ARGS: >-
+      --build-arg node_version=${NODE_VERSION}
+      --build-arg debian_version=${DEBIAN_VERSION}
+      --build-arg pnpm_version=${PNPM_VERSION}
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web"'
+    - changes:
+        - debian-pnpm/**/*
+        - .gitlab-ci.yml
 
 cmake-debian:build:
-  stage: build
-  tags:
-    - shell
+  extends: .docker-build
   parallel:
     matrix:
       # Debian versions to build
@@ -76,24 +99,22 @@ cmake-debian:build:
         # Important: No array for CPPCHECK_VERSION and CMAKE_VERSION
         CPPCHECK_VERSION: "2.20.0"
         CMAKE_VERSION: "4.2.1"
-  script:
-    - cd cmake
-    - export IMAGE_NAME="cmake:${DEBIAN_VERSION}-cppcheck-${CPPCHECK_VERSION}"
-    - |
-      docker build \
-        --build-arg debian_version=${DEBIAN_VERSION} \
-        --build-arg cppcheck_version=${CPPCHECK_VERSION} \
-        --build-arg cmake_version=${CMAKE_VERSION} \
-        -t $CI_REGISTRY_IMAGE/$IMAGE_NAME \
-        -t $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME \
-        -f debian.Dockerfile .
-    - docker push $CI_REGISTRY_IMAGE/$IMAGE_NAME
-    - docker push $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME
+  variables:
+    BUILD_DIR: cmake
+    DOCKERFILE: debian.Dockerfile
+    IMAGE_NAME: cmake:${DEBIAN_VERSION}-cppcheck-${CPPCHECK_VERSION}
+    BUILD_ARGS: >-
+      --build-arg debian_version=${DEBIAN_VERSION}
+      --build-arg cppcheck_version=${CPPCHECK_VERSION}
+      --build-arg cmake_version=${CMAKE_VERSION}
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web"'
+    - changes:
+        - cmake/**/*
+        - .gitlab-ci.yml
 
 cmake-ubuntu:build:
-  stage: build
-  tags:
-    - shell
+  extends: .docker-build
   parallel:
     matrix:
       # Ubuntu versions to build
@@ -101,84 +122,106 @@ cmake-ubuntu:build:
         # Important: No array for CPPCHECK_VERSION and CMAKE_VERSION
         CPPCHECK_VERSION: "2.20.0"
         CMAKE_VERSION: "4.3.2"
-  script:
-    - cd cmake
-    - export IMAGE_NAME="cmake:${UBUNTU_VERSION}-cppcheck-${CPPCHECK_VERSION}"
-    - |
-      docker build \
-        --build-arg ubuntu_version=${UBUNTU_VERSION} \
-        --build-arg cppcheck_version=${CPPCHECK_VERSION} \
-        --build-arg cmake_version=${CMAKE_VERSION} \
-        -t $CI_REGISTRY_IMAGE/$IMAGE_NAME \
-        -t $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME \
-        -f ubuntu.Dockerfile .
-    - docker push $CI_REGISTRY_IMAGE/$IMAGE_NAME
-    - docker push $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME
+  variables:
+    BUILD_DIR: cmake
+    DOCKERFILE: ubuntu.Dockerfile
+    IMAGE_NAME: cmake:${UBUNTU_VERSION}-cppcheck-${CPPCHECK_VERSION}
+    BUILD_ARGS: >-
+      --build-arg ubuntu_version=${UBUNTU_VERSION}
+      --build-arg cppcheck_version=${CPPCHECK_VERSION}
+      --build-arg cmake_version=${CMAKE_VERSION}
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web"'
+    - changes:
+        - cmake/**/*
+        - .gitlab-ci.yml
 
-gtk-cmake-ninja:build:
-  stage: build
-  # This build depends on the cmake images being built first
-  needs: ["cmake-debian:build", "cmake-ubuntu:build"]
-  tags:
-    - shell
+# The gtk images build FROM the cmake images. Split into a Debian and an
+# Ubuntu job so each only waits for its own base images. The needs are
+# optional: when the cmake jobs are skipped (no changes), the previously
+# pushed cmake image from the registry is used instead.
+gtk-cmake-ninja-debian:build:
+  extends: .docker-build
+  needs:
+    - job: "cmake-debian:build"
+      optional: true
   parallel:
     matrix:
       # Provide multiple GTK versions (both are installed in the same image), comma separated.
       - GTK_VERSIONS: "3.0,4.0"
-        # Both Debian + Ubuntu
-        DISTRO_VERSION: ["bookworm", "trixie", "forky", "noble", "plucky"]
+        DISTRO_VERSION: ["bookworm", "trixie", "forky"]
         # Important: No array for CPPCHECK_VERSION
         CPPCHECK_VERSION: "2.20.0"
-  script:
-    - cd gtk-cmake-ninja
-    - export IMAGE_NAME="gtk-cmake-ninja:${DISTRO_VERSION}"
-    - |
-      docker build \
-        --build-arg distro_version=${DISTRO_VERSION} \
-        --build-arg cppcheck_version=${CPPCHECK_VERSION} \
-        --build-arg gtk_versions=${GTK_VERSIONS} \
-        -t $CI_REGISTRY_IMAGE/$IMAGE_NAME \
-        -t $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME \
-        -f Dockerfile .
-    - docker push $CI_REGISTRY_IMAGE/$IMAGE_NAME
-    - docker push $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME
+  variables:
+    BUILD_DIR: gtk-cmake-ninja
+    IMAGE_NAME: gtk-cmake-ninja:${DISTRO_VERSION}
+    BUILD_ARGS: >-
+      --build-arg distro_version=${DISTRO_VERSION}
+      --build-arg cppcheck_version=${CPPCHECK_VERSION}
+      --build-arg gtk_versions=${GTK_VERSIONS}
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web"'
+    # Also rebuild when the cmake base images change
+    - changes:
+        - gtk-cmake-ninja/**/*
+        - cmake/**/*
+        - .gitlab-ci.yml
+
+gtk-cmake-ninja-ubuntu:build:
+  extends: .docker-build
+  needs:
+    - job: "cmake-ubuntu:build"
+      optional: true
+  parallel:
+    matrix:
+      # Provide multiple GTK versions (both are installed in the same image), comma separated.
+      - GTK_VERSIONS: "3.0,4.0"
+        DISTRO_VERSION: ["noble", "plucky"]
+        # Important: No array for CPPCHECK_VERSION
+        CPPCHECK_VERSION: "2.20.0"
+  variables:
+    BUILD_DIR: gtk-cmake-ninja
+    IMAGE_NAME: gtk-cmake-ninja:${DISTRO_VERSION}
+    BUILD_ARGS: >-
+      --build-arg distro_version=${DISTRO_VERSION}
+      --build-arg cppcheck_version=${CPPCHECK_VERSION}
+      --build-arg gtk_versions=${GTK_VERSIONS}
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web"'
+    # Also rebuild when the cmake base images change
+    - changes:
+        - gtk-cmake-ninja/**/*
+        - cmake/**/*
+        - .gitlab-ci.yml
 
 php:build:
-  stage: build
-  tags:
-    - shell
+  extends: .docker-build
   variables:
     PHP_VERSION: "8.5"
-  script:
-    - cd php
-    - export IMAGE_NAME="php:${PHP_VERSION}"
-    - |
-      docker build \
-        --build-arg php_version=${PHP_VERSION} \
-        -t $CI_REGISTRY_IMAGE/$IMAGE_NAME \
-        -t $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME \
-        -f Dockerfile .
-    - docker push $CI_REGISTRY_IMAGE/$IMAGE_NAME
-    - docker push $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME
+    BUILD_DIR: php
+    IMAGE_NAME: php:${PHP_VERSION}
+    BUILD_ARGS: >-
+      --build-arg php_version=${PHP_VERSION}
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web"'
+    - changes:
+        - php/**/*
+        - .gitlab-ci.yml
 
 rust:build:
-  stage: build
-  tags:
-    - shell
+  extends: .docker-build
   variables:
     RUST_VERSION: "1.95"
     NODE_VERSION: "24.15.0"
     PNPM_VERSION: "11.9.0"
-  script:
-    - cd rust
-    - export IMAGE_NAME="rust:${RUST_VERSION}-node-${NODE_VERSION}"
-    - |
-      docker build \
-        --build-arg rust_version=${RUST_VERSION} \
-        --build-arg node_version=${NODE_VERSION} \
-        --build-arg pnpm_version=${PNPM_VERSION} \
-        -t $CI_REGISTRY_IMAGE/$IMAGE_NAME \
-        -t $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME \
-        -f Dockerfile .
-    - docker push $CI_REGISTRY_IMAGE/$IMAGE_NAME
-    - docker push $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME
+    BUILD_DIR: rust
+    IMAGE_NAME: rust:${RUST_VERSION}-node-${NODE_VERSION}
+    BUILD_ARGS: >-
+      --build-arg rust_version=${RUST_VERSION}
+      --build-arg node_version=${NODE_VERSION}
+      --build-arg pnpm_version=${PNPM_VERSION}
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web"'
+    - changes:
+        - rust/**/*
+        - .gitlab-ci.yml
