@@ -25,7 +25,7 @@ pnpm-alpine:build:
       # LTS releases only for now (only major version)
       - NODE_VERSION: ["24"]
         # Important: No array for PNPM_VERSION
-        PNPM_VERSION: "11.5.2"
+        PNPM_VERSION: "11.9.0"
   script:
     - cd pnpm
     - export IMAGE_NAME="pnpm:${NODE_VERSION}"
@@ -50,7 +50,7 @@ pnpm-debian:build:
         # Important: No array for DEBIAN_VERSION (just use latest stable)
         DEBIAN_VERSION: "trixie"
         # Important: No array for PNPM_VERSION
-        PNPM_VERSION: "11.5.2"
+        PNPM_VERSION: "11.9.0"
   script:
     - cd debian-pnpm
     - export IMAGE_NAME="debian-pnpm:${NODE_VERSION}-${DEBIAN_VERSION}"
@@ -168,7 +168,7 @@ rust:build:
   variables:
     RUST_VERSION: "1.95"
     NODE_VERSION: "24.15.0"
-    PNPM_VERSION: "11.5.2"
+    PNPM_VERSION: "11.9.0"
   script:
     - cd rust
     - export IMAGE_NAME="rust:${RUST_VERSION}-node-${NODE_VERSION}"
