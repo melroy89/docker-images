@@ -1,5 +1,5 @@
 ARG distro_version=trixie
-ARG cppcheck_version=2.19.0
+ARG cppcheck_version=2.21.0
 FROM registry.melroy.org/melroy/docker-images/cmake:${distro_version}-cppcheck-${cppcheck_version}
 
 ARG gtk_versions=3.0,4.0

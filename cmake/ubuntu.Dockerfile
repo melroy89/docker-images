@@ -4,7 +4,7 @@ FROM ubuntu:${ubuntu_version}
 # By default all ARGs are no longer available after the FROM statement.
 # So we need to redefine them if we want to use them later on.
 ARG ubuntu_version
-ARG cppcheck_version=2.19.0
+ARG cppcheck_version=2.21.0
 ARG cmake_version=4.2.1
 ARG build_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 

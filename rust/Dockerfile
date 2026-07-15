@@ -3,7 +3,7 @@ ARG rust_version=1.95
 FROM rust:${rust_version}-trixie
 
 ARG pnpm_version=latest
-ARG node_version=24.15.0
+ARG node_version=24.18.0
 ARG build_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 LABEL org.opencontainers.image.title="Rust image with Node.js" \

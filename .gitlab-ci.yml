@@ -24,6 +24,22 @@ default:
     # Using GitLab deploy token
     - echo "$CI_DEPLOY_PASSWORD" | docker login -u "$CI_DEPLOY_USER" --password-stdin "$CI_REGISTRY"
 
+# Limit how many build jobs run in parallel, to leave CI server resources for
+# the other services running on the same machine.
+# GitLab has no native "max N concurrent" keyword, so we approximate it with
+# `resource_group`: each group runs at most one job at a time. By spreading all
+# jobs (and their matrix instances) across POOL_1..POOL_4 in round-robin order,
+# at most ~4 build jobs execute concurrently. To change the cap, add/remove
+# pool anchors below and re-balance the `extends` assignments.
+.pool-1:
+  resource_group: build-pool-1
+.pool-2:
+  resource_group: build-pool-2
+.pool-3:
+  resource_group: build-pool-3
+.pool-4:
+  resource_group: build-pool-4
+
 # Shared build & push logic. Jobs set: BUILD_DIR, IMAGE_NAME, BUILD_ARGS
 # and optionally DOCKERFILE (defaults to "Dockerfile").
 # --pull ensures we always build on top of the latest (patched) base image,
@@ -48,13 +64,15 @@ default:
     - docker push $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME
 
 pnpm-alpine:build:
-  extends: .docker-build
+  extends:
+    - .docker-build
+    - .pool-1
   parallel:
     matrix:
       # LTS releases only for now (only major version)
       - NODE_VERSION: ["24"]
         # Important: No array for PNPM_VERSION
-        PNPM_VERSION: "11.9.0"
+        PNPM_VERSION: "11.13.0"
   variables:
     BUILD_DIR: pnpm
     IMAGE_NAME: pnpm:${NODE_VERSION}
@@ -68,15 +86,17 @@ pnpm-alpine:build:
         - .gitlab-ci.yml
 
 pnpm-debian:build:
-  extends: .docker-build
+  extends:
+    - .docker-build
+    - .pool-2
   parallel:
     matrix:
       # Only build latest LTS version for now (major + minor node.js version)
-      - NODE_VERSION: "24.15.0"
+      - NODE_VERSION: "24.18.0"
         # Important: No array for DEBIAN_VERSION (just use latest stable)
         DEBIAN_VERSION: "trixie"
         # Important: No array for PNPM_VERSION
-        PNPM_VERSION: "11.9.0"
+        PNPM_VERSION: "11.13.0"
   variables:
     BUILD_DIR: debian-pnpm
     IMAGE_NAME: debian-pnpm:${NODE_VERSION}-${DEBIAN_VERSION}
@@ -92,12 +112,25 @@ pnpm-debian:build:
 
 cmake-debian:build:
   extends: .docker-build
+  # POOL spreads each matrix instance across build-pool-1..4 (see anchors above).
+  resource_group: build-pool-${POOL}
   parallel:
     matrix:
-      # Debian versions to build
-      - DEBIAN_VERSION: ["bookworm", "trixie", "forky"]
+      # Debian versions to build. One entry per version so each carries its own POOL.
+      - DEBIAN_VERSION: "bookworm"
+        POOL: "3"
         # Important: No array for CPPCHECK_VERSION and CMAKE_VERSION
-        CPPCHECK_VERSION: "2.20.0"
+        CPPCHECK_VERSION: "2.21.0"
+        CMAKE_VERSION: "4.2.1"
+      - DEBIAN_VERSION: "trixie"
+        POOL: "4"
+        # Important: No array for CPPCHECK_VERSION and CMAKE_VERSION
+        CPPCHECK_VERSION: "2.21.0"
+        CMAKE_VERSION: "4.2.1"
+      - DEBIAN_VERSION: "forky"
+        POOL: "1"
+        # Important: No array for CPPCHECK_VERSION and CMAKE_VERSION
+        CPPCHECK_VERSION: "2.21.0"
         CMAKE_VERSION: "4.2.1"
   variables:
     BUILD_DIR: cmake
@@ -115,12 +148,26 @@ cmake-debian:build:
 
 cmake-ubuntu:build:
   extends: .docker-build
+  # POOL spreads each matrix instance across build-pool-1..4 (see anchors above).
+  resource_group: build-pool-${POOL}
   parallel:
     matrix:
-      # Ubuntu versions to build
-      - UBUNTU_VERSION: ["noble", "plucky"]
+      # Ubuntu versions to build. One entry per version so each carries its own POOL.
+      - UBUNTU_VERSION: "noble"
+        POOL: "2"
         # Important: No array for CPPCHECK_VERSION and CMAKE_VERSION
-        CPPCHECK_VERSION: "2.20.0"
+        CPPCHECK_VERSION: "2.21.0"
+        CMAKE_VERSION: "4.3.2"
+      - UBUNTU_VERSION: "plucky"
+        POOL: "3"
+        # Important: No array for CPPCHECK_VERSION and CMAKE_VERSION
+        CPPCHECK_VERSION: "2.21.0"
+        CMAKE_VERSION: "4.3.2"
+      # Ubuntu 26.04 LTS "resolute"
+      - UBUNTU_VERSION: "resolute"
+        POOL: "4"
+        # Important: No array for CPPCHECK_VERSION and CMAKE_VERSION
+        CPPCHECK_VERSION: "2.21.0"
         CMAKE_VERSION: "4.3.2"
   variables:
     BUILD_DIR: cmake
@@ -145,13 +192,25 @@ gtk-cmake-ninja-debian:build:
   needs:
     - job: "cmake-debian:build"
       optional: true
+  # POOL spreads each matrix instance across build-pool-1..4 (see anchors above).
+  resource_group: build-pool-${POOL}
   parallel:
     matrix:
       # Provide multiple GTK versions (both are installed in the same image), comma separated.
+      # One entry per distro version so each carries its own POOL.
       - GTK_VERSIONS: "3.0,4.0"
-        DISTRO_VERSION: ["bookworm", "trixie", "forky"]
+        DISTRO_VERSION: "bookworm"
+        POOL: "4"
         # Important: No array for CPPCHECK_VERSION
-        CPPCHECK_VERSION: "2.20.0"
+        CPPCHECK_VERSION: "2.21.0"
+      - GTK_VERSIONS: "3.0,4.0"
+        DISTRO_VERSION: "trixie"
+        POOL: "1"
+        CPPCHECK_VERSION: "2.21.0"
+      - GTK_VERSIONS: "3.0,4.0"
+        DISTRO_VERSION: "forky"
+        POOL: "2"
+        CPPCHECK_VERSION: "2.21.0"
   variables:
     BUILD_DIR: gtk-cmake-ninja
     IMAGE_NAME: gtk-cmake-ninja:${DISTRO_VERSION}
@@ -172,13 +231,26 @@ gtk-cmake-ninja-ubuntu:build:
   needs:
     - job: "cmake-ubuntu:build"
       optional: true
+  # POOL spreads each matrix instance across build-pool-1..4 (see anchors above).
+  resource_group: build-pool-${POOL}
   parallel:
     matrix:
       # Provide multiple GTK versions (both are installed in the same image), comma separated.
+      # One entry per distro version so each carries its own POOL.
       - GTK_VERSIONS: "3.0,4.0"
-        DISTRO_VERSION: ["noble", "plucky"]
+        DISTRO_VERSION: "noble"
+        POOL: "3"
         # Important: No array for CPPCHECK_VERSION
-        CPPCHECK_VERSION: "2.20.0"
+        CPPCHECK_VERSION: "2.21.0"
+      - GTK_VERSIONS: "3.0,4.0"
+        DISTRO_VERSION: "plucky"
+        POOL: "4"
+        CPPCHECK_VERSION: "2.21.0"
+      # Ubuntu 26.04 LTS "resolute"
+      - GTK_VERSIONS: "3.0,4.0"
+        DISTRO_VERSION: "resolute"
+        POOL: "3"
+        CPPCHECK_VERSION: "2.21.0"
   variables:
     BUILD_DIR: gtk-cmake-ninja
     IMAGE_NAME: gtk-cmake-ninja:${DISTRO_VERSION}
@@ -195,7 +267,9 @@ gtk-cmake-ninja-ubuntu:build:
         - .gitlab-ci.yml
 
 php:build:
-  extends: .docker-build
+  extends:
+    - .docker-build
+    - .pool-1
   variables:
     PHP_VERSION: "8.5"
     BUILD_DIR: php
@@ -209,11 +283,13 @@ php:build:
         - .gitlab-ci.yml
 
 rust:build:
-  extends: .docker-build
+  extends:
+    - .docker-build
+    - .pool-2
   variables:
     RUST_VERSION: "1.95"
-    NODE_VERSION: "24.15.0"
-    PNPM_VERSION: "11.9.0"
+    NODE_VERSION: "24.18.0"
+    PNPM_VERSION: "11.13.0"
     BUILD_DIR: rust
     IMAGE_NAME: rust:${RUST_VERSION}-node-${NODE_VERSION}
     BUILD_ARGS: >-
