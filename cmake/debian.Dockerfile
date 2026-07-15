@@ -63,7 +63,8 @@ RUN apt install -y --no-install-recommends \
     valgrind \
     gdb \
     clang-format \
-    libssl-dev && \
+    gperf \
+    libgstreamer1.0-dev && \
     apt clean
 
 # Install cpplint via pip

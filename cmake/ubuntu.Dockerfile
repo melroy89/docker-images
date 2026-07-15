@@ -22,7 +22,7 @@ RUN apt --allow-releaseinfo-change update
 RUN apt update && apt upgrade -y
 
 # APT install (base) packages
-RUN apt install -y build-essential libboost-all-dev pkg-config pkg-config libssl-dev openssl
+RUN apt install -y build-essential libboost-all-dev pkg-config libssl-dev openssl
 RUN apt install -y ninja-build doxygen graphviz
 RUN apt install -y --no-install-recommends curl wget
 
@@ -65,7 +65,8 @@ RUN apt install -y --no-install-recommends \
     valgrind \
     gdb \
     clang-format \
-    libssl-dev && \
+    gperf \
+    libgstreamer1.0-dev && \
     apt clean
 
 # Install cpplint via pip
