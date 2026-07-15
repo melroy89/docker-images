@@ -24,13 +24,10 @@ default:
     # Using GitLab deploy token
     - echo "$CI_DEPLOY_PASSWORD" | docker login -u "$CI_DEPLOY_USER" --password-stdin "$CI_REGISTRY"
 
-# Limit how many build jobs run in parallel, to leave CI server resources for
-# the other services running on the same machine.
-# GitLab has no native "max N concurrent" keyword, so we approximate it with
-# `resource_group`: each group runs at most one job at a time. By spreading all
-# jobs (and their matrix instances) across POOL_1..POOL_4 in round-robin order,
-# at most ~4 build jobs execute concurrently. To change the cap, add/remove
-# pool anchors below and re-balance the `extends` assignments.
+# Cap concurrent builds at ~4 to leave CI resources for other services on the
+# host. GitLab has no native "max N" keyword, so we approximate it with 4
+# `resource_group` pools (each runs one job at a time) and spread every job and
+# matrix instance across them round-robin via .pool-N / the POOL matrix var.
 .pool-1:
   resource_group: build-pool-1
 .pool-2:
@@ -111,24 +108,14 @@ pnpm-debian:build:
         - .gitlab-ci.yml
 
 cmake-debian:build:
-  extends: .docker-build
-  # POOL spreads each matrix instance across build-pool-1..4 (see anchors above).
-  resource_group: build-pool-${POOL}
+  extends:
+    - .docker-build
+    # Dedicated pool: all Debian versions build one at a time (CPU-heavy).
+    - .pool-1
   parallel:
     matrix:
-      # Debian versions to build. One entry per version so each carries its own POOL.
-      - DEBIAN_VERSION: "bookworm"
-        POOL: "3"
-        # Important: No array for CPPCHECK_VERSION and CMAKE_VERSION
-        CPPCHECK_VERSION: "2.21.0"
-        CMAKE_VERSION: "4.2.1"
-      - DEBIAN_VERSION: "trixie"
-        POOL: "4"
-        # Important: No array for CPPCHECK_VERSION and CMAKE_VERSION
-        CPPCHECK_VERSION: "2.21.0"
-        CMAKE_VERSION: "4.2.1"
-      - DEBIAN_VERSION: "forky"
-        POOL: "1"
+      # Debian versions to build.
+      - DEBIAN_VERSION: ["bookworm", "trixie", "forky"]
         # Important: No array for CPPCHECK_VERSION and CMAKE_VERSION
         CPPCHECK_VERSION: "2.21.0"
         CMAKE_VERSION: "4.2.1"
@@ -147,25 +134,14 @@ cmake-debian:build:
         - .gitlab-ci.yml
 
 cmake-ubuntu:build:
-  extends: .docker-build
-  # POOL spreads each matrix instance across build-pool-1..4 (see anchors above).
-  resource_group: build-pool-${POOL}
+  extends:
+    - .docker-build
+    # Dedicated pool: all Ubuntu versions build one at a time (CPU-heavy).
+    - .pool-2
   parallel:
     matrix:
-      # Ubuntu versions to build. One entry per version so each carries its own POOL.
-      - UBUNTU_VERSION: "noble"
-        POOL: "2"
-        # Important: No array for CPPCHECK_VERSION and CMAKE_VERSION
-        CPPCHECK_VERSION: "2.21.0"
-        CMAKE_VERSION: "4.3.2"
-      - UBUNTU_VERSION: "plucky"
-        POOL: "3"
-        # Important: No array for CPPCHECK_VERSION and CMAKE_VERSION
-        CPPCHECK_VERSION: "2.21.0"
-        CMAKE_VERSION: "4.3.2"
-      # Ubuntu 26.04 LTS "resolute"
-      - UBUNTU_VERSION: "resolute"
-        POOL: "4"
+      # Ubuntu versions to build (incl. 26.04 LTS "resolute").
+      - UBUNTU_VERSION: ["noble", "plucky", "resolute"]
         # Important: No array for CPPCHECK_VERSION and CMAKE_VERSION
         CPPCHECK_VERSION: "2.21.0"
         CMAKE_VERSION: "4.3.2"
@@ -188,28 +164,19 @@ cmake-ubuntu:build:
 # optional: when the cmake jobs are skipped (no changes), the previously
 # pushed cmake image from the registry is used instead.
 gtk-cmake-ninja-debian:build:
-  extends: .docker-build
+  extends:
+    - .docker-build
+    # Dedicated pool: all Debian versions build one at a time (CPU-heavy).
+    - .pool-3
   needs:
     - job: "cmake-debian:build"
       optional: true
-  # POOL spreads each matrix instance across build-pool-1..4 (see anchors above).
-  resource_group: build-pool-${POOL}
   parallel:
     matrix:
       # Provide multiple GTK versions (both are installed in the same image), comma separated.
-      # One entry per distro version so each carries its own POOL.
       - GTK_VERSIONS: "3.0,4.0"
-        DISTRO_VERSION: "bookworm"
-        POOL: "4"
+        DISTRO_VERSION: ["bookworm", "trixie", "forky"]
         # Important: No array for CPPCHECK_VERSION
-        CPPCHECK_VERSION: "2.21.0"
-      - GTK_VERSIONS: "3.0,4.0"
-        DISTRO_VERSION: "trixie"
-        POOL: "1"
-        CPPCHECK_VERSION: "2.21.0"
-      - GTK_VERSIONS: "3.0,4.0"
-        DISTRO_VERSION: "forky"
-        POOL: "2"
         CPPCHECK_VERSION: "2.21.0"
   variables:
     BUILD_DIR: gtk-cmake-ninja
@@ -227,29 +194,20 @@ gtk-cmake-ninja-debian:build:
         - .gitlab-ci.yml
 
 gtk-cmake-ninja-ubuntu:build:
-  extends: .docker-build
+  extends:
+    - .docker-build
+    # Dedicated pool: all Ubuntu versions build one at a time (CPU-heavy).
+    - .pool-4
   needs:
     - job: "cmake-ubuntu:build"
       optional: true
-  # POOL spreads each matrix instance across build-pool-1..4 (see anchors above).
-  resource_group: build-pool-${POOL}
   parallel:
     matrix:
       # Provide multiple GTK versions (both are installed in the same image), comma separated.
-      # One entry per distro version so each carries its own POOL.
+      # Distro versions incl. Ubuntu 26.04 LTS "resolute".
       - GTK_VERSIONS: "3.0,4.0"
-        DISTRO_VERSION: "noble"
-        POOL: "3"
+        DISTRO_VERSION: ["noble", "plucky", "resolute"]
         # Important: No array for CPPCHECK_VERSION
-        CPPCHECK_VERSION: "2.21.0"
-      - GTK_VERSIONS: "3.0,4.0"
-        DISTRO_VERSION: "plucky"
-        POOL: "4"
-        CPPCHECK_VERSION: "2.21.0"
-      # Ubuntu 26.04 LTS "resolute"
-      - GTK_VERSIONS: "3.0,4.0"
-        DISTRO_VERSION: "resolute"
-        POOL: "3"
         CPPCHECK_VERSION: "2.21.0"
   variables:
     BUILD_DIR: gtk-cmake-ninja
@@ -269,7 +227,7 @@ gtk-cmake-ninja-ubuntu:build:
 php:build:
   extends:
     - .docker-build
-    - .pool-1
+    - .pool-3
   variables:
     PHP_VERSION: "8.5"
     BUILD_DIR: php
@@ -285,7 +243,7 @@ php:build:
 rust:build:
   extends:
     - .docker-build
-    - .pool-2
+    - .pool-4
   variables:
     RUST_VERSION: "1.95"
     NODE_VERSION: "24.18.0"
