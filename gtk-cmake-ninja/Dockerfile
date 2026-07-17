@@ -15,6 +15,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && \
   apt-get install -y curl libsecret-1-dev libcurl4-openssl-dev xvfb \
+    gstreamer1.0-plugins-good gstreamer1.0-alsa gstreamer1.0-pipewire \
     $(echo ${gtk_versions} | tr ',' ' ' | xargs -n 1 printf "libgtkmm-%s-dev ") && \
   apt-get clean && \
   rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
