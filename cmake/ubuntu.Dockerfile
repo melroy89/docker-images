@@ -66,7 +66,8 @@ RUN apt install -y --no-install-recommends \
     gdb \
     clang-format \
     gperf \
-    libgstreamer1.0-dev && \
+    libgstreamer1.0-dev \
+    libgstreamer-plugins-base1.0-dev && \
     apt clean
 
 # Install cpplint via pip
