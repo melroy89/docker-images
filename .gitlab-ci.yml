@@ -15,14 +15,24 @@ workflow:
     # Pushes to the default branch only rebuild the images whose files changed
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
 
-default:
-  # Allow newer pipelines to auto-cancel jobs of redundant older pipelines
-  interruptible: true
-  before_script:
+# Registry authentication, kept reusable so it can run again right before the
+# pushes: `docker login` only establishes a session, and the registry issues a
+# short-lived bearer token from it. An image build here can run for half an
+# hour, which leaves plenty of room for the session established at job start to
+# be useless by push time ("denied: requested access to the resource is
+# denied").
+.registry-login:
+  script:
     # Docker Hub
     - echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin "$DOCKERHUB_REGISTRY"
     # Using GitLab deploy token
     - echo "$CI_DEPLOY_PASSWORD" | docker login -u "$CI_DEPLOY_USER" --password-stdin "$CI_REGISTRY"
+
+default:
+  # Allow newer pipelines to auto-cancel jobs of redundant older pipelines
+  interruptible: true
+  before_script:
+    - !reference [.registry-login, script]
 
 # Cap concurrent builds at ~4 to leave CI resources for other services on the
 # host. GitLab has no native "max N" keyword, so we approximate it with 4
@@ -57,6 +67,10 @@ default:
         -t $CI_REGISTRY_IMAGE/$IMAGE_NAME \
         -t $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME \
         -f $DOCKERFILE .
+    # Re-authenticate against both registries: the build above can easily take
+    # 30+ minutes, so do not rely on the login from before_script still being
+    # good. Cheap (a couple of seconds) compared to redoing the build.
+    - !reference [.registry-login, script]
     - docker push $CI_REGISTRY_IMAGE/$IMAGE_NAME
     - docker push $DOCKERHUB_REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME
 
