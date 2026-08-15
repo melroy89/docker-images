@@ -83,7 +83,7 @@ pnpm-alpine:build:
       # LTS releases only for now (only major version)
       - NODE_VERSION: ["24"]
         # Important: No array for PNPM_VERSION
-        PNPM_VERSION: "11.13.0"
+        PNPM_VERSION: "11.21.0"
   variables:
     BUILD_DIR: pnpm
     IMAGE_NAME: pnpm:${NODE_VERSION}
@@ -103,11 +103,11 @@ pnpm-debian:build:
   parallel:
     matrix:
       # Only build latest LTS version for now (major + minor node.js version)
-      - NODE_VERSION: "24.18.0"
+      - NODE_VERSION: "24.19.0"
         # Important: No array for DEBIAN_VERSION (just use latest stable)
         DEBIAN_VERSION: "trixie"
         # Important: No array for PNPM_VERSION
-        PNPM_VERSION: "11.13.0"
+        PNPM_VERSION: "11.21.0"
   variables:
     BUILD_DIR: debian-pnpm
     IMAGE_NAME: debian-pnpm:${NODE_VERSION}-${DEBIAN_VERSION}
@@ -260,8 +260,8 @@ rust:build:
     - .pool-4
   variables:
     RUST_VERSION: "1.95"
-    NODE_VERSION: "24.18.0"
-    PNPM_VERSION: "11.13.0"
+    NODE_VERSION: "24.19.0"
+    PNPM_VERSION: "11.21.0"
     BUILD_DIR: rust
     IMAGE_NAME: rust:${RUST_VERSION}-node-${NODE_VERSION}
     BUILD_ARGS: >-
