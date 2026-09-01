@@ -238,6 +238,22 @@ gtk-cmake-ninja-ubuntu:build:
         - cmake/**/*
         - .gitlab-ci.yml
 
+gtk-cmake-ninja-opensuse:build:
+  extends:
+    - .docker-build
+    - .pool-4
+  variables:
+    BUILD_DIR: gtk-cmake-ninja
+    DOCKERFILE: opensuse.Dockerfile
+    IMAGE_NAME: gtk-cmake-ninja:tumbleweed
+    BUILD_ARGS: >-
+      --build-arg distro_version=tumbleweed
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web"'
+    - changes:
+        - gtk-cmake-ninja/**/*
+        - .gitlab-ci.yml
+
 php:build:
   extends:
     - .docker-build

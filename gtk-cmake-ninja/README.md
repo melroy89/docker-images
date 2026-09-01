@@ -9,9 +9,12 @@ With the extension of gtkmm library installed.
 
 **EXTRA NEW:** We now install multiple GTK versions (both GTK3 and GTK4 at the moment) and also added Ubuntu distros, the tags are still: `<DISTRO_RELEASE_NAME>`. Eg. `gtk-cmake-ninja:trixie` or `gtk-cmake-ninja:noble`.
 
-## Docker Image
+The `tumbleweed` tag provides a native openSUSE Tumbleweed GTK4/gtkmm4 and RPM packaging environment.
+
+## Docker Images
 
 - [Dockerfile](https://gitlab.melroy.org/melroy/docker-images/-/blob/main/gtk-cmake-ninja/Dockerfile).
+- [openSUSE Dockerfile](https://gitlab.melroy.org/melroy/docker-images/-/blob/main/gtk-cmake-ninja/opensuse.Dockerfile).
 
 
 ## Build (Optional)
