@@ -20,7 +20,7 @@ RUN apt update && \
       curl -fsSL https://deb.nodesource.com/setup_24.x | bash - && \
       apt install -y nodejs=${node_version}-1nodesource1 \
         build-essential pkg-config rsync \
-        libx11-dev libxcursor-dev libxi-dev libxkbcommon-dev libxrandr-dev libwayland-dev \
+        libx11-dev libxcursor-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-0 libxrandr-dev libwayland-dev \
         libgl1-mesa-dev libgl1-mesa-dri \
         procps python3 time xvfb && \
       apt clean && \
