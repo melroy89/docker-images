@@ -52,6 +52,9 @@ RUN mkdir -p "$PNPM_HOME" && \
 # Add turbo globally
 RUN pnpm add turbo --global
 
+# Common Rust CI components
+RUN rustup component add rustfmt clippy
+
 # Create a non-root user with UID and GID 1000
 # and use /build as home directory
 RUN groupadd -g 1000 user && \
