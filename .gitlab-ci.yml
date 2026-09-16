@@ -259,7 +259,7 @@ rust:build:
     - .docker-build
     - .pool-4
   variables:
-    RUST_VERSION: "1.98"
+    RUST_VERSION: "1.98.1"
     NODE_VERSION: "24.20.0"
     PNPM_VERSION: "12.4.1"
     BUILD_DIR: rust

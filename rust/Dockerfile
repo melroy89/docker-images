@@ -1,4 +1,4 @@
-ARG rust_version=1.95
+ARG rust_version=1.98.1
 
 FROM rust:${rust_version}-trixie
 
@@ -7,7 +7,7 @@ ARG node_version=24.18.0
 ARG build_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 LABEL org.opencontainers.image.title="Rust image with Node.js" \
-      org.opencontainers.image.description="Rust image with Node.js, pnpm, build essential, pkg-config and rsync preinstalled" \
+      org.opencontainers.image.description="Rust image with Node.js, pnpm, native Linux build tools and headless UI test support" \
       org.opencontainers.image.created="${build_date}" \
       org.opencontainers.image.authors="melroy@melroy.org" \
       org.opencontainers.image.url="https://gitlab.melroy.org/melroy/docker-images" \
@@ -18,7 +18,11 @@ RUN apt update && \
       apt upgrade -y && \
       apt install -y curl ca-certificates && \
       curl -fsSL https://deb.nodesource.com/setup_24.x | bash - && \
-      apt install -y nodejs=${node_version}-1nodesource1 build-essential pkg-config rsync && \
+      apt install -y nodejs=${node_version}-1nodesource1 \
+        build-essential pkg-config rsync \
+        libx11-dev libxkbcommon-dev libwayland-dev \
+        libgl1-mesa-dev libgl1-mesa-dri \
+        procps python3 time xvfb && \
       apt clean && \
       rm -rf /var/lib/apt/lists/*
 
