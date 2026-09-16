@@ -15,7 +15,6 @@ LABEL org.opencontainers.image.title="Rust image with Node.js" \
 
 # Install Node.js
 RUN apt update && \
-      apt upgrade -y && \
       apt install -y curl ca-certificates && \
       curl -fsSL https://deb.nodesource.com/setup_24.x | bash - && \
       apt install -y nodejs=${node_version}-1nodesource1 \
