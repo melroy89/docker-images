@@ -31,11 +31,11 @@ build:
 
 ## Docker Tags
 
-While there is a specific pnpm version used (ideally the latest pnpm v10 at the moment of writing).
+The pnpm version is pinned in `.gitlab-ci.yml`.
 
 The _Docker tag_ however is simply the Node.js version.
 
-For example: `24`. This is inline with the Node.js Docker image naming convention. Just note we use the Alpine version.
+Available Node.js tags: `24` and `26`. This is inline with the Node.js Docker image naming convention. Just note we use the Alpine version.
 
 ## Docker Image
 

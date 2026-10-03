@@ -80,8 +80,8 @@ pnpm-alpine:build:
     - .pool-1
   parallel:
     matrix:
-      # LTS releases only for now (only major version)
-      - NODE_VERSION: ["24"]
+      # Build Node.js 24 LTS and Node.js 26 (major version tags)
+      - NODE_VERSION: ["24", "26"]
         # Important: No array for PNPM_VERSION
         PNPM_VERSION: "12.4.1"
   variables:
@@ -102,8 +102,8 @@ pnpm-debian:build:
     - .pool-2
   parallel:
     matrix:
-      # Only build latest LTS version for now (major + minor node.js version)
-      - NODE_VERSION: "24.20.0"
+      # Build Node.js 24 LTS and the latest Node.js 26 release
+      - NODE_VERSION: ["24.20.0", "26.10.0"]
         # Important: No array for DEBIAN_VERSION (just use latest stable)
         DEBIAN_VERSION: "trixie"
         # Important: No array for PNPM_VERSION
