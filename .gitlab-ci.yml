@@ -103,7 +103,7 @@ pnpm-debian:build:
   parallel:
     matrix:
       # Build Node.js 24 LTS and the latest Node.js 26 release
-      - NODE_VERSION: ["24.20.0", "26.10.0"]
+      - NODE_VERSION: ["24.22.1", "26.12.2"]
         # Important: No array for DEBIAN_VERSION (just use latest stable)
         DEBIAN_VERSION: "trixie"
         # Important: No array for PNPM_VERSION
@@ -260,7 +260,7 @@ rust:build:
     - .pool-4
   variables:
     RUST_VERSION: "1.98.1"
-    NODE_VERSION: "24.20.0"
+    NODE_VERSION: "24.22.1"
     PNPM_VERSION: "12.4.1"
     BUILD_DIR: rust
     IMAGE_NAME: rust:${RUST_VERSION}-node-${NODE_VERSION}
