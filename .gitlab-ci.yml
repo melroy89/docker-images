@@ -103,7 +103,7 @@ pnpm-debian:build:
   parallel:
     matrix:
       # Build Node.js 24 LTS and the latest Node.js 26 release
-      - NODE_VERSION: ["24.22.1", "26.12.2"]
+      - NODE_VERSION: ["24.22.1", "26.12.1"]
         # Important: No array for DEBIAN_VERSION (just use latest stable)
         DEBIAN_VERSION: "trixie"
         # Important: No array for PNPM_VERSION
