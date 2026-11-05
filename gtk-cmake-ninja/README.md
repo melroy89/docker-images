@@ -3,6 +3,10 @@
 A docker image based on my [Cmake Docker image](../cmake).
 With the extension of gtkmm library installed.
 
+Includes `nlohmann-json3-dev`, AppStream validation tools and `jq` so consumers
+can configure JSON dependencies and validate release metadata without installing
+these packages during each CI job.
+
 **Important:** We moved to a different tagging scheme. The tag is just the Debian version we use. Eg. `bookworm`. Also `latest` is no longer created.
 
 **NEW:** We deployed Trixie Docker images as well now, based on the latest Debian LTS release.
