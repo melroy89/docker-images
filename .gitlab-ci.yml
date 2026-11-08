@@ -80,8 +80,8 @@ pnpm-alpine:build:
     - .pool-1
   parallel:
     matrix:
-      # Build Node.js 24 LTS and Node.js 26 (major version tags)
-      - NODE_VERSION: ["24", "26"]
+      # Build Node.js 26 LTS
+      - NODE_VERSION: ["26"]
         # Important: No array for PNPM_VERSION
         PNPM_VERSION: "12.18.0"
   variables:
@@ -102,8 +102,8 @@ pnpm-debian:build:
     - .pool-2
   parallel:
     matrix:
-      # Build Node.js 24 LTS and the latest Node.js 26 release
-      - NODE_VERSION: ["24.22.1", "26.12.1"]
+      # Build Node.js 26 LTS
+      - NODE_VERSION: ["26.13.0"]
         # Important: No array for DEBIAN_VERSION (just use latest stable)
         DEBIAN_VERSION: "trixie"
         # Important: No array for PNPM_VERSION
@@ -260,8 +260,8 @@ rust:build:
     - .pool-4
   variables:
     RUST_VERSION: "1.98.1"
-    NODE_VERSION: "24.22.1"
-    PNPM_VERSION: "12.4.1"
+    NODE_VERSION: "26.13.0"
+    PNPM_VERSION: "12.18.0"
     BUILD_DIR: rust
     IMAGE_NAME: rust:${RUST_VERSION}-node-${NODE_VERSION}
     BUILD_ARGS: >-
