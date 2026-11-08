@@ -83,7 +83,7 @@ pnpm-alpine:build:
       # Build Node.js 24 LTS and Node.js 26 (major version tags)
       - NODE_VERSION: ["24", "26"]
         # Important: No array for PNPM_VERSION
-        PNPM_VERSION: "12.4.1"
+        PNPM_VERSION: "12.18.0"
   variables:
     BUILD_DIR: pnpm
     IMAGE_NAME: pnpm:${NODE_VERSION}
@@ -107,7 +107,7 @@ pnpm-debian:build:
         # Important: No array for DEBIAN_VERSION (just use latest stable)
         DEBIAN_VERSION: "trixie"
         # Important: No array for PNPM_VERSION
-        PNPM_VERSION: "12.4.1"
+        PNPM_VERSION: "12.18.0"
   variables:
     BUILD_DIR: debian-pnpm
     IMAGE_NAME: debian-pnpm:${NODE_VERSION}-${DEBIAN_VERSION}
@@ -261,7 +261,7 @@ rust:build:
   variables:
     RUST_VERSION: "1.98.1"
     NODE_VERSION: "24.22.1"
-    PNPM_VERSION: "12.4.1"
+    PNPM_VERSION: "12.18.0"
     BUILD_DIR: rust
     IMAGE_NAME: rust:${RUST_VERSION}-node-${NODE_VERSION}
     BUILD_ARGS: >-
