@@ -3,7 +3,7 @@ ARG rust_version=1.98.1
 FROM rust:${rust_version}-trixie
 
 ARG pnpm_version=latest
-ARG node_version=24.18.0
+ARG node_version=26.13.0
 ARG build_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 LABEL org.opencontainers.image.title="Rust image with Node.js" \
@@ -16,7 +16,7 @@ LABEL org.opencontainers.image.title="Rust image with Node.js" \
 # Install Node.js
 RUN apt update && \
       apt install -y curl ca-certificates && \
-      curl -fsSL https://deb.nodesource.com/setup_24.x | bash - && \
+      curl -fsSL "https://deb.nodesource.com/setup_${node_version%%.*}.x" | bash - && \
       apt install -y nodejs=${node_version}-1nodesource1 \
         build-essential pkg-config rsync \
         libx11-dev libxcursor-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-0 libxrandr-dev libwayland-dev \
