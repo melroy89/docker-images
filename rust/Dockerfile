@@ -18,7 +18,7 @@ RUN apt update && \
       apt install -y curl ca-certificates && \
       curl -fsSL "https://deb.nodesource.com/setup_${node_version%%.*}.x" | bash - && \
       apt install -y nodejs=${node_version}-1nodesource1 \
-        build-essential pkg-config rsync \
+        build-essential cmake pkg-config rsync \
         libx11-dev libxcursor-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-0 libxrandr-dev libwayland-dev \
         libgl1-mesa-dev libgl1-mesa-dri \
         procps python3 time xvfb && \

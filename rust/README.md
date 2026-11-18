@@ -2,7 +2,7 @@
 
 This Docker image is based on Rust, but also contains Node.js.
 
-As a bonus you will also get `build-essential`, `pkg-config` and `rsync` pre-installed.
+As a bonus you will also get `build-essential`, `cmake`, `pkg-config` and `rsync` pre-installed.
 
 ## Build (Optional)
 
