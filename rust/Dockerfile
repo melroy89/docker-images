@@ -67,4 +67,7 @@ RUN corepack prepare "pnpm@${pnpm_version}" --activate
 # Configure pnpm store
 RUN pnpm config set store-dir .pnpm-store
 
+# Match the upstream Rust image and GitLab Runner's checkout/helper user.
+# Consumers can explicitly select the prepared non-root account with USER user.
+USER root
 WORKDIR /build
