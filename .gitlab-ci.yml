@@ -243,11 +243,8 @@ php:build:
     - .docker-build
     - .pool-3
   variables:
-    PHP_VERSION: "8.5"
     BUILD_DIR: php
-    IMAGE_NAME: php:${PHP_VERSION}
-    BUILD_ARGS: >-
-      --build-arg php_version=${PHP_VERSION}
+    IMAGE_NAME: php:8.6
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web"'
     - changes:

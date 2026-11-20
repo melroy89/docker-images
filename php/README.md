@@ -17,7 +17,7 @@ stages:
 
 coding-style:
   stage: test
-  image: danger89/php:8.5
+  image: danger89/php:8.6
   script:
     - vendor/bin/php-cs-fixer fix --dry-run --diff
 ```
@@ -27,7 +27,7 @@ coding-style:
 Use a specific tag:
 
 ```sh
-docker pull danger89/php:8.5
+docker pull danger89/php:8.6
 ```
 
 The Docker tag refers to the PHP version.
