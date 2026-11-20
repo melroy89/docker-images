@@ -10,8 +10,7 @@ ENV CXXFLAGS='-std=c++23'
 
 RUN apt-get update && apt-get install -y --no-install-recommends $BUILD_DEPS $LIB_DEPS $TOOL_DEPS $DEPLOYMENT_DEPS && rm -rf /var/lib/apt/lists/* \
  && echo "date.timezone=Europe/Amsterdam" >> $PHP_INI_DIR/php.ini \
- && docker-php-ext-install zip \
- && if ! php -r 'exit(extension_loaded("mbstring") ? 0 : 1);'; then docker-php-ext-install mbstring; fi
+ && docker-php-ext-install zip mbstring
 
 RUN cd /tmp && curl -Ls https://github.com/unicode-org/icu/releases/download/release-$ICU_RELEASE/icu4c-$ICU_RELEASE-sources.tgz > icu4c-sources.tgz \
  && cd /tmp && tar xzf icu4c-sources.tgz && cd /tmp/icu/source && ./runConfigureICU Linux && make -j 10 && make install && rm -rf /tmp/icu /tmp/icu4c-sources.tgz
